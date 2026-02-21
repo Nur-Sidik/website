@@ -1,0 +1,142 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #faf8f5;
+  --foreground: #1a2e1a;
+  --card: #ffffff;
+  --card-foreground: #1a2e1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a2e1a;
+  --primary: #2E8B57;
+  --primary-foreground: #ffffff;
+  --secondary: #F4A460;
+  --secondary-foreground: #1a2e1a;
+  --muted: #f0ebe4;
+  --muted-foreground: #5a6b5a;
+  --accent: #F4A460;
+  --accent-foreground: #1a2e1a;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: #d4cfc7;
+  --input: #d4cfc7;
+  --ring: #2E8B57;
+  --chart-1: #2E8B57;
+  --chart-2: #F4A460;
+  --chart-3: #1a5c38;
+  --chart-4: #d4915a;
+  --chart-5: #3da76d;
+  --radius: 0.75rem;
+  --sidebar: #faf8f5;
+  --sidebar-foreground: #1a2e1a;
+  --sidebar-primary: #2E8B57;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0ebe4;
+  --sidebar-accent-foreground: #1a2e1a;
+  --sidebar-border: #d4cfc7;
+  --sidebar-ring: #2E8B57;
+
+  --mangrove-green: #2E8B57;
+  --mangrove-dark: #1a5c38;
+  --sand-beige: #F4A460;
+  --sand-light: #fdf0e0;
+  --cream: #faf8f5;
+}
+
+.dark {
+  --background: #0f1f14;
+  --foreground: #e8f0e8;
+  --card: #162a1c;
+  --card-foreground: #e8f0e8;
+  --popover: #162a1c;
+  --popover-foreground: #e8f0e8;
+  --primary: #3da76d;
+  --primary-foreground: #ffffff;
+  --secondary: #d4915a;
+  --secondary-foreground: #1a2e1a;
+  --muted: #1e3526;
+  --muted-foreground: #8fa98f;
+  --accent: #d4915a;
+  --accent-foreground: #1a2e1a;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: #2a4533;
+  --input: #2a4533;
+  --ring: #3da76d;
+  --chart-1: #3da76d;
+  --chart-2: #d4915a;
+  --chart-3: #2E8B57;
+  --chart-4: #F4A460;
+  --chart-5: #1a5c38;
+  --sidebar: #0f1f14;
+  --sidebar-foreground: #e8f0e8;
+  --sidebar-primary: #3da76d;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e3526;
+  --sidebar-accent-foreground: #e8f0e8;
+  --sidebar-border: #2a4533;
+  --sidebar-ring: #3da76d;
+
+  --mangrove-green: #3da76d;
+  --mangrove-dark: #2E8B57;
+  --sand-beige: #d4915a;
+  --sand-light: #2a2015;
+  --cream: #0f1f14;
+}
+
+@theme inline {
+  --font-sans: 'Plus Jakarta Sans', 'Geist', 'Geist Fallback';
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-mangrove-green: var(--mangrove-green);
+  --color-mangrove-dark: var(--mangrove-dark);
+  --color-sand-beige: var(--sand-beige);
+  --color-sand-light: var(--sand-light);
+  --color-cream: var(--cream);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

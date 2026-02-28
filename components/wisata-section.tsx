@@ -5,23 +5,16 @@ import { ArrowRight, MapPin } from "lucide-react"
 // 👇 DAFTAR 6 WISATA (Sesuai Fotonya)
 const wisataItems = [
   {
-    title: "Wisata Penyu",
-    description: "Konservasi dan pelepasan tukik.",
-    image: "/images/Foto1.jpg", // Pastikan nama file sama persis
-    link: "/kategori/wisata/penyu",
-    tag: "Konservasi"
-  },
-  {
     title: "Burung Migran",
     description: "Pengamatan burung yang bermigrasi.",
-    image: "/images/Foto2.jpeg",
+    image: "/images/Foto6.jpg",
     link: "/kategori/wisata/burung",
     tag: "Edukasi"
   },
   {
     title: "Hutan Mangrove",
     description: "Jelajah ekosistem mangrove dan temukan keindahan di dalamnya.",
-    image: "/images/Foto3.jpeg",
+    image: "/images/Foto5.jpg",
     link: "/kategori/wisata/mangrove",
     tag: "Alam"
   },
@@ -35,14 +28,14 @@ const wisataItems = [
   {
     title: "Menara Pantau",
     description: "Saksikan pemandangan Burung yang bermigrasi dari ketinggian.",
-    image: "/images/Foto5.jpeg",
+    image: "/images/Foto3.jpg",
     link: "/kategori/wisata/menara",
     tag: "Spot Foto"
   },
   {
     title: "Numpak Perahu",
     description: "Saksikan indahnya Mangrove dengan perahu tradisional.",
-    image: "/images/Foto6.jpeg", // Perhatikan .jpg
+    image: "/images/Foto2.jpeg", // Perhatikan .jpg
     link: "/kategori/wisata/susur-sungai",
     tag: "Petualangan"
   },

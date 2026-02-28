@@ -5,21 +5,14 @@ const features = [
   {
     title: "Burung Migrasi",
     description: "Amati para burung yang bermigrasi di habitat alami mangrove",
-    image: "/images/Foto2.jpeg",
+    image: "/images/Foto6.jpg",
     icon: Bird,
-    href: "#wisata",
-  },
-  {
-    title: "Konservasi Penyu",
-    description: "Ikut serta dalam pelestarian penyu di Pantai Trisik",
-    image: "/images/konservasi-penyu.jpg",
-    icon: Shell,
     href: "#wisata",
   },
   {
     title: "Hutan Mangrove",
     description: "Jelajahi ekosistem mangrove",
-    image: "/images/Foto3.jpeg",
+    image: "/images/Foto5.jpg",
     icon: Trees,
     href: "#wisata",
   },
@@ -33,15 +26,15 @@ const features = [
   {
     title: "Menara Pantau",
     description: "Nikmati pemandangan indah dari menara pantau",
-    image: "/images/Foto5.jpeg",
+    image: "/images/Foto3.jpg",
     icon: TowerControl,
     href: "#wisata",
   },
   {
     title: "Numpak Perahu",
     description: "Saksikan indahnya Mangrove dengan perahu tradisional",
-    image: "/images/Foto6.jpeg",
-    icon: Waves,
+    image: "/images/Foto2.jpeg",
+    icon: Shell,
     href: "#wisata",
   },
 ]

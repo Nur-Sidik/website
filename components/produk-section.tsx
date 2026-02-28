@@ -2,9 +2,9 @@ import { Leaf, Fish, Coffee, ShoppingBag, BottleWine } from "lucide-react"
 
 const produkItems = [
   {
-    title: "Sirup Mangrove",
-    description: "Sirup manis dan segar dari buah mangrove pilihan, cocok untuk minuman dan campuran koktail.",
-    price: "Rp 25.000",
+    title: "Contoh Produk Lokal Disini",
+    description: "-",
+    price: " - ",
     icon: BottleWine,
   },
   {

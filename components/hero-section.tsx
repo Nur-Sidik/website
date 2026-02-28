@@ -12,7 +12,7 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero-mangrove.jpg"
+          src="/images/Foto1.jpg"
           alt="Hutan mangrove yang rimbun di Desa Banaran, Kulonprogo"
           fill
           className="object-cover"
@@ -30,16 +30,15 @@ export function HeroSection() {
 
       {/* Glassmorphism Hero Card */}
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center px-4 pt-24 pb-8 sm:px-6 lg:px-8">
-        <div className="mb-12 w-full max-w-2xl rounded-2xl border border-primary-foreground/20 bg-primary-foreground/10 p-8 text-center shadow-2xl backdrop-blur-xl sm:p-12 lg:mb-16">
+        <div className="mb-12 w-full max-w-2xl rounded-2xl border border-transparent bg-transparent p-8 text-center sm:p-12 lg:mb-16">
 
-          {/* 👇 INI YANG DIUBAH: Judul Besar langsung nama Desa */}
           <h1 className="mb-4 text-4xl font-extrabold leading-tight text-sand-beige sm:text-5xl lg:text-6xl text-balance drop-shadow-md">
             Desa Wisata Banaran
           </h1>
 
           {/* Deskripsi di bawahnya */}
           <p className="mx-auto mb-8 max-w-lg text-base leading-relaxed text-primary-foreground/90 text-pretty font-medium">
-            kata katanya ntar disini wokkk
+          Jelajahi keindahan alam, budaya, dan petualangan seru di Desa Banaran. Temukan pengalaman wisata yang tak terlupakan di pesisir selatan Kulonprogo, Yogyakarta.
           </p>
 
           <a

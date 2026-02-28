@@ -6,17 +6,17 @@ const contactInfo = [
   {
     icon: MapPin,
     label: "Alamat",
-    value: "Desa Banaran, Kec. Galur, Kulonprogo, Yogyakarta 55661 (bener gasih alamatnya?)",
+    value: "Desa Banaran, Kec. Galur, Kulonprogo, Yogyakarta 55666",
   },
   {
     icon: Phone,
     label: "Telepon",
-    value: "+62 81-289-368-677 (jangan tanya nomer siapa, nomer saya ini hehe)",
+    value: "+62 81-289-368-677",
   },
   {
     icon: Mail,
     label: "Email",
-    value: "info@desabanaran.id (contoh)",
+    value: "info@desabanaran.id",
   },
   {
     icon: Clock,

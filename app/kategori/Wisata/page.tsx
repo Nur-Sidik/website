@@ -4,49 +4,57 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { ArrowRight, MapPin } from "lucide-react"
 
-// 👇 INI PERBAIKANNYA: Nama file harus PERSIS SAMA dengan yang di folder public/images
+// Data Wisata (Pastikan foto ada di public/images)
 const wisataItems = [
   {
     id: 1,
     title: "Wisata Penyu",
-    desc: "Melihat konservasi penyu lekang dan pelepasan tukik.",
-    image: "/images/Foto1.jpeg", // Pastikan F besar dan .jpeg
-    link: "/kategori/wisata/penyu"
+    desc: "Konservasi penyu lekang.",
+    image: "/images/Foto1.jpeg", // Pastikan nama file benar
+    link: "/kategori/wisata/penyu",
+    // 👇 Logika CSS Kamu: span 2 kolom, span 2 baris (start 1, 1)
+    className: "col-span-2 row-span-2" 
   },
   {
     id: 2, 
     title: "Burung Migran",
-    desc: "Pengamatan burung langka yang bermigrasi dari benua lain.",
+    desc: "Pengamatan burung.",
     image: "/images/Foto2.jpeg", 
-    link: "/kategori/wisata/burung"
+    link: "/kategori/wisata/burung",
+    // 👇 Logika CSS Kamu: span 2 kolom, span 2 baris (start 1, 3)
+    className: "col-span-2 row-span-2"
   },
   {
     id: 3,
     title: "Hutan Mangrove",
-    desc: "Tracking seru menembus rimbunnya hutan bakau.",
+    desc: "Tracking hutan bakau.",
     image: "/images/Foto3.jpeg",
-    link: "/kategori/wisata/mangrove" 
+    link: "/kategori/wisata/mangrove",
+    className: "col-span-2 row-span-2" 
   },
   {
     id: 4,
     title: "Pantai Trisik",
-    desc: "Menikmati sunset dan aktivitas nelayan di pasir hitam.",
+    desc: "Sunset pasir hitam.",
     image: "/images/Foto4.jpeg",
-    link: "/kategori/wisata/pantai"
+    link: "/kategori/wisata/pantai",
+    className: "col-span-2 row-span-2"
   },
   {
     id: 5,
     title: "Menara Pantau",
-    desc: "Melihat pemandangan Desa Banaran dari ketinggian.",
+    desc: "View dari atas.",
     image: "/images/Foto5.jpeg",
-    link: "/kategori/wisata/menara"
+    link: "/kategori/wisata/menara",
+    className: "col-span-2 row-span-2"
   },
   {
     id: 6,
     title: "Susur Sungai",
-    desc: "Menikmati aliran sungai progo dengan perahu wisata.",
-    image: "/images/Foto6.jpeg",
-    link: "/kategori/wisata/susur-sungai"
+    desc: "Wisata perahu.",
+    image: "/images/Foto6.jpg", // Perhatikan .jpg
+    link: "/kategori/wisata/susur-sungai",
+    className: "col-span-2 row-span-2"
   },
 ]
 
@@ -55,58 +63,45 @@ export default function KategoriWisataPage() {
     <main className="min-h-screen bg-[#faf8f5]">
       <Navbar />
       
-      {/* Header Halaman */}
+      {/* Header */}
       <div className="pt-32 pb-12 px-6 text-center bg-[#1a5c38] text-white rounded-b-[3rem] shadow-xl">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[#F4A460]">Destinasi Wisata</h1>
-        <p className="max-w-xl mx-auto text-white/80 text-lg">
-          Jelajahi 6 keajaiban alam yang tersembunyi di Desa Banaran.
+        <p className="max-w-xl mx-auto text-white/80">
+          Jelajahi keindahan alam Desa Banaran.
         </p>
       </div>
 
-      {/* Grid Layout 6 Kolom (Sesuai Request CSS Kamu) */}
       <section className="max-w-7xl mx-auto px-6 py-20">
-        {/* Penjelasan Grid:
-           - grid-cols-1: HP (1 kolom ke bawah)
-           - md:grid-cols-2: Tablet (2 kolom)
-           - lg:grid-cols-3: Laptop (3 kolom) -> Ini setara dengan maumu (1,2,3 baris atas, 4,5,6 baris bawah)
-        */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        {/* 👇 INI GRID SESUAI CSS KAMU (repeat(6, 1fr)) */}
+        {/* Di HP: 1 Kolom. Di Laptop (md): 6 Kolom */}
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           
           {wisataItems.map((item) => (
             <Link 
               href={item.link} 
               key={item.id}
-              className="group relative h-[450px] w-full overflow-hidden rounded-3xl border-4 border-transparent hover:border-[#F4A460] transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-2 bg-gray-200"
+              // className di sini akan mengambil 'col-span-2' dari data di atas
+              className={`group relative overflow-hidden rounded-2xl bg-gray-200 border-2 border-transparent hover:border-[#F4A460] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 ${item.className}`}
             >
-              {/* Gambar Full */}
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              
-              {/* Overlay Gelap */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-90" />
-
-              {/* Konten Teks */}
-              <div className="absolute bottom-0 left-0 p-8 w-full text-white">
-                <div className="flex items-center gap-2 text-[#F4A460] text-xs font-bold uppercase tracking-wider mb-2">
-                   <MapPin className="h-4 w-4" /> Desa Banaran
-                </div>
-                <h3 className="text-3xl font-bold mb-3">{item.title}</h3>
-                <p className="text-white/80 text-sm line-clamp-2 mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                  {item.desc}
-                </p>
-                
-                <div className="inline-flex items-center gap-2 text-[#F4A460] font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md">
-                  Jelajahi <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </div>
+              {/* Gambar (Isi Penuh Kotak) */}
+              <div className="absolute inset-0 w-full h-full">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
               </div>
-              
-              {/* Nomor Urut */}
-              <div className="absolute top-5 right-5 bg-black/30 backdrop-blur-md h-12 w-12 flex items-center justify-center rounded-full text-white font-bold border border-white/20 text-lg">
-                {item.id}
+
+              {/* Teks Overlay */}
+              <div className="absolute bottom-0 left-0 p-6 text-white w-full bg-gradient-to-t from-black/80 to-transparent">
+                <h3 className="text-xl font-bold mb-1">{item.title}</h3>
+                <p className="text-xs text-white/80 line-clamp-2">{item.desc}</p>
+                <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowRight className="h-4 w-4 text-[#F4A460]" />
+                </div>
               </div>
             </Link>
           ))}

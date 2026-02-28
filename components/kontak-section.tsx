@@ -6,17 +6,17 @@ const contactInfo = [
   {
     icon: MapPin,
     label: "Alamat",
-    value: "Desa Banaran, Kec. Galur, Kulonprogo, Yogyakarta 55661",
+    value: "Desa Banaran, Kec. Galur, Kulonprogo, Yogyakarta 55661 (bener gasih alamatnya?)",
   },
   {
     icon: Phone,
     label: "Telepon",
-    value: "+62 812 3456 7890",
+    value: "+62 81-289-368-677 (jangan tanya nomer siapa, nomer saya ini hehe)",
   },
   {
     icon: Mail,
     label: "Email",
-    value: "info@desabanaran.id",
+    value: "info@desabanaran.id (contoh)",
   },
   {
     icon: Clock,
@@ -47,7 +47,7 @@ export function KontakSection() {
             </h2>
             <p className="mb-8 max-w-md text-base leading-relaxed text-muted-foreground text-pretty">
               Kami siap membantu merencanakan pengalaman wisata terbaik untuk
-              Anda di Desa Banaran. Hubungi kami untuk informasi lebih lanjut.
+              Anda di Desa Banaran. Hubungi kami untuk informasi lebih lanjut (masih bentuk demonstrasi, belum bisa kirim sebuah pesan).
             </p>
 
             <div className="flex flex-col gap-6">
@@ -75,50 +75,21 @@ export function KontakSection() {
               Kirim Pesan
             </h3>
             <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="nama"
-                    className="mb-1.5 block text-sm font-medium text-foreground"
-                  >
-                    Nama Lengkap
-                  </label>
-                  <input
-                    id="nama"
-                    type="text"
-                    placeholder="Masukkan nama"
-                    className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-mangrove-green focus:ring-2 focus:ring-mangrove-green/20 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="mb-1.5 block text-sm font-medium text-foreground"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="nama@email.com"
-                    className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-mangrove-green focus:ring-2 focus:ring-mangrove-green/20 focus:outline-none"
-                  />
-                </div>
-              </div>
               <div>
                 <label
-                  htmlFor="subjek"
+                  htmlFor="nama"
                   className="mb-1.5 block text-sm font-medium text-foreground"
                 >
-                  Subjek
+                  Nama Lengkap
                 </label>
                 <input
-                  id="subjek"
+                  id="nama"
                   type="text"
-                  placeholder="Topik pesan Anda"
+                  placeholder="Masukkan nama"
                   className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-mangrove-green focus:ring-2 focus:ring-mangrove-green/20 focus:outline-none"
                 />
               </div>
+              
               <div>
                 <label
                   htmlFor="pesan"
@@ -133,9 +104,10 @@ export function KontakSection() {
                   className="w-full resize-none rounded-lg border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-mangrove-green focus:ring-2 focus:ring-mangrove-green/20 focus:outline-none"
                 />
               </div>
+
               <button
                 type="submit"
-                className="w-full rounded-xl bg-mangrove-green px-6 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-mangrove-dark hover:shadow-lg"
+                className="w-full mt-2 rounded-xl bg-mangrove-green px-6 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-mangrove-dark hover:shadow-lg"
               >
                 Kirim Pesan
               </button>

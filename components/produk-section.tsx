@@ -1,29 +1,29 @@
-import { Leaf, Fish, Coffee, ShoppingBag } from "lucide-react"
+import { Leaf, Fish, Coffee, ShoppingBag, BottleWine } from "lucide-react"
 
 const produkItems = [
   {
-    title: "Keripik Mangrove",
-    description: "Camilan khas dari buah mangrove yang diolah secara tradisional oleh masyarakat setempat.",
+    title: "Sirup Mangrove",
+    description: "Sirup manis dan segar dari buah mangrove pilihan, cocok untuk minuman dan campuran koktail.",
     price: "Rp 25.000",
-    icon: Leaf,
+    icon: BottleWine,
   },
   {
-    title: "Ikan Asin Premium",
-    description: "Ikan segar dari hasil tangkapan nelayan Banaran, diawetkan dengan cara tradisional.",
-    price: "Rp 35.000",
-    icon: Fish,
+    title: "(nanti yang lain bisa disini)",
+    description: "-",
+    price: "Rp - ",
+    icon: BottleWine,
   },
   {
-    title: "Teh Mangrove",
-    description: "Teh herbal organik dari daun mangrove pilihan, kaya antioksidan dan menyegarkan.",
-    price: "Rp 20.000",
-    icon: Coffee,
+    title: "(nanti yang lain bisa disini)",
+    description: "-",
+    price: "Rp - ",
+    icon: BottleWine
   },
   {
-    title: "Batik Mangrove",
-    description: "Batik cap bermotif mangrove buatan pengrajin lokal, cocok untuk oleh-oleh khas.",
-    price: "Rp 150.000",
-    icon: ShoppingBag,
+    title: "(nanti yang lain bisa disini)",
+    description: "-",
+    price: "Rp - ",
+    icon: BottleWine
   },
 ]
 

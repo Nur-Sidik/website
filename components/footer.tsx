@@ -77,7 +77,7 @@ export function Footer() {
                 Yogyakarta 55661
               </li>
               <li className="text-sm text-primary-foreground/70">
-                +62 812 3456 7890
+                +62 812 2893 68677
               </li>
               <li className="text-sm text-primary-foreground/70">
                 info@desabanaran.id

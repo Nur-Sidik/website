@@ -1,11 +1,11 @@
 import Image from "next/image"
-import { Bird, Shell, Trees, Waves } from "lucide-react"
+import { Bird, Shell, TowerControl, Trees, Waves } from "lucide-react"
 
 const features = [
   {
     title: "Burung Migrasi",
     description: "Amati para burung yang bermigrasi di habitat alami mangrove",
-    image: "/images/burung-migran.jpg",
+    image: "/images/Foto2.jpeg",
     icon: Bird,
     href: "#wisata",
   },
@@ -19,14 +19,28 @@ const features = [
   {
     title: "Hutan Mangrove",
     description: "Jelajahi ekosistem mangrove",
-    image: "/images/hutan-mangrove.jpg",
+    image: "/images/Foto3.jpeg",
     icon: Trees,
     href: "#wisata",
   },
   {
     title: "Pantai Trisik",
     description: "Nikmati keindahan pantai pasir putih dan ombak yang menenangkan",
-    image: "/images/pantai-trisik.jpg",
+    image: "/images/Foto4.jpeg",
+    icon: Waves,
+    href: "#wisata",
+  },
+  {
+    title: "Menara Pantau",
+    description: "Nikmati pemandangan indah dari menara pantau",
+    image: "/images/Foto5.jpeg",
+    icon: TowerControl,
+    href: "#wisata",
+  },
+  {
+    title: "Numpak Perahu",
+    description: "Saksikan indahnya Mangrove dengan perahu tradisional",
+    image: "/images/Foto6.jpeg",
     icon: Waves,
     href: "#wisata",
   },

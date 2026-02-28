@@ -24,10 +24,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    /* 👇 Tambahan P3K: suppressHydrationWarning biar error merah hilang */
     <html lang="id" suppressHydrationWarning>
       <head>
-        {/* --- 🛑 SUNTIKAN MAUT UNTUK SI "N" --- */}
         <style>{`
           [data-nextjs-toast],
           [data-nextjs-dialog-overlay],
@@ -48,7 +46,6 @@ export default function RootLayout({
         `}</style>
       </head>
       
-      {/* 👇 Tambahan juga di body biar makin aman */}
       <body 
         className={`${plusJakarta.variable} font-sans antialiased`}
         suppressHydrationWarning

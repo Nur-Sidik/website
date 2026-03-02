@@ -28,8 +28,7 @@ const navLinks = [
       { label: "Burung Migran", href: "/kategori/wisata/burung" },
       { label: "Pantai Trisik", href: "/kategori/wisata/pantai" },
       { label: "Menara Pantau", href: "/kategori/wisata/menara" },
-      { label: "Ekonomi Mangrove", href: "/kategori/ekonomi/mangrove" },
-      { label: "Sirup Mangrove", href: "/kategori/ekonomi/sirup" },
+
     ]
   },
   { 

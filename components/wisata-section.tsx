@@ -1,42 +1,47 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, MapPin } from "lucide-react"
+import { ArrowRight, MapPin, Bird, Trees, Waves, TowerControl, Shell } from "lucide-react"
 
 // 👇 DAFTAR 6 WISATA (Sesuai Fotonya)
 const wisataItems = [
   {
     title: "Burung Migran",
     description: "Pengamatan burung yang bermigrasi.",
-    image: "/images/Foto6.jpg",
+    image: "/images/FotoBurungMigrasi.jpg",
     link: "/kategori/wisata/burung",
+    icon: Bird,
     tag: "Edukasi"
   },
   {
     title: "Hutan Mangrove",
     description: "Jelajah ekosistem mangrove dan temukan keindahan di dalamnya.",
-    image: "/images/Foto5.jpg",
+    image: "/images/FotoMangrove.jpg",
     link: "/kategori/wisata/mangrove",
+    icon: Trees,
     tag: "Alam"
   },
   {
     title: "Pantai Trisik",
     description: "Keindahan pantai dengan pasir putih dan ombak yang menenangkan.",
-    image: "/images/Foto4.jpeg",
+    image: "/images/FotoPantai.jpeg",
     link: "/kategori/wisata/pantai",
+    icon: Waves,
     tag: "Wisata"
   },
   {
     title: "Menara Pantau",
     description: "Saksikan pemandangan Burung yang bermigrasi dari ketinggian.",
-    image: "/images/Foto3.jpg",
+    image: "/images/FotoMenaraPantau.jpg",
     link: "/kategori/wisata/menara",
+    icon: TowerControl,
     tag: "Spot Foto"
   },
   {
     title: "Numpak Perahu",
     description: "Saksikan indahnya Mangrove dengan perahu tradisional.",
-    image: "/images/Foto2.jpeg", // Perhatikan .jpg
-    link: "/kategori/wisata/susur-sungai",
+    image: "/images/FotoNumpakPerahu.jpeg", // Perhatikan .jpeg
+    link: "/kategori/wisata/numpak-perahu",
+    icon: Shell,
     tag: "Petualangan"
   },
 ]
@@ -56,51 +61,64 @@ export function WisataSection() {
           </p>
         </div>
 
-        {/* 👇 GRID 6 KOTAK (3 Kolom x 2 Baris) */}
-        <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-          {wisataItems.map((post) => (
-            <article key={post.title} className="flex flex-col items-start justify-between group">
-              
-              {/* Gambar dengan Hover Effect */}
-              <div className="relative w-full overflow-hidden rounded-2xl bg-gray-100 aspect-[4/3]">
-                <Image
-                  src={post.image}
-                  alt={post.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
-                
-                {/* Tag di pojok gambar */}
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-mangrove-dark shadow-sm">
-                  {post.tag}
-                </div>
-              </div>
+        {/* 👇 GRID FEATURE CARDS (Gaya 3-2 yang kamu suka) */}
+        <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-6">
+          
+          {wisataItems.map((post, index) => {
+            // Logika Posisi (3 Atas, 2 Bawah Tengah)
+            let gridPos = "md:col-span-2" 
+            
+            // Geser kartu ke-4 (Index 3) ke tengah kiri
+            if (index === 3) gridPos += " md:col-start-2"
+            // Geser kartu ke-5 (Index 4) ke tengah kanan
+            if (index === 4) gridPos += " md:col-start-4"
 
-              {/* Teks di bawah gambar */}
-              <div className="max-w-xl mt-4">
-                <div className="flex items-center gap-x-2 text-xs text-sand-beige mb-2">
-                  <MapPin className="h-3 w-3" />
-                  <span>Desa Banaran</span>
+            return (
+              <Link
+                key={post.title}
+                href={post.link}
+                className={`group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${gridPos}`}
+              >
+                {/* Gambar Card */}
+                <div className="relative h-48 overflow-hidden sm:h-56">
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                  {/* Overlay Gradient Halus */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" aria-hidden="true" />
+                  
+                  {/* Ikon di Pojok Kiri Bawah */}
+                  <div className="absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full bg-sand-beige/90 text-mangrove-dark shadow-md">
+                    {post.icon && <post.icon className="h-4 w-4" aria-hidden="true" />}
+                  </div>
+
+                  {/* Tag di Pojok Kanan Atas */}
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-mangrove-dark shadow-sm">
+                    {post.tag}
+                  </div>
                 </div>
-                
-                <h3 className="text-lg font-semibold leading-6 text-gray-900 group-hover:text-mangrove-green transition-colors">
-                  <Link href={post.link}>
-                    <span className="absolute inset-0" />
+
+                {/* Konten Card */}
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="mb-2 text-lg font-bold text-gray-900 group-hover:text-mangrove-green transition-colors">
                     {post.title}
-                  </Link>
-                </h3>
-                
-                <p className="mt-2 line-clamp-2 text-sm leading-6 text-gray-600">
-                  {post.description}
-                </p>
-
-                <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-mangrove-green group-hover:gap-2 transition-all">
-                  Lihat Detail <ArrowRight className="h-4 w-4" />
+                  </h3>
+                  <p className="text-sm leading-relaxed text-gray-600 mb-4 line-clamp-2">
+                    {post.description}
+                  </p>
+                  
+                  {/* Tombol Panah Kecil */}
+                  <div className="mt-auto flex items-center gap-1 text-xs font-bold text-mangrove-green uppercase tracking-wide group-hover:gap-2 transition-all">
+                    Lihat Detail <ArrowRight className="h-3 w-3" />
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </Link>
+            )
+          })}
         </div>
 
       </div>

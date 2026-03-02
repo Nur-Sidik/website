@@ -24,18 +24,18 @@ const navLinks = [
     label: "Kategori", 
     href: "#",
     subItems: [
-      { label: "Wisata Penyu", href: "/kategori/wisata/penyu" },
       { label: "Burung Migran", href: "/kategori/wisata/burung" },
+      { label: "Hutan Mangrove", href: "/kategori/wisata/mangrove" },
       { label: "Pantai Trisik", href: "/kategori/wisata/pantai" },
       { label: "Menara Pantau", href: "/kategori/wisata/menara" },
-
+      { label: "Numpak Perahu", href: "/kategori/wisata/numpak-perahu" },
     ]
   },
   { 
     label: "Komunitas", 
     href: "#",
     subItems: [
-        { label: "Kelompok Tani Hutan (KTH)", href: "/komunitas/kth" },
+        { label: "Kelompok Tani Hutan", href: "/komunitas/kth" },
         { label: "Karang Taruna", href: "/komunitas/kt" },
     ]
   },

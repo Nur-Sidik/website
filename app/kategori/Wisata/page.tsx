@@ -7,53 +7,44 @@ import { ArrowRight, MapPin } from "lucide-react"
 // Data Wisata (Pastikan foto ada di public/images)
 const wisataItems = [
   {
-    id: 1,
-    title: "Wisata Penyu",
-    desc: "Konservasi penyu lekang.",
-    image: "/images/Foto1.jpeg", // Pastikan nama file benar
-    link: "/kategori/wisata/penyu",
-    // 👇 Logika CSS Kamu: span 2 kolom, span 2 baris (start 1, 1)
-    className: "col-span-2 row-span-2" 
-  },
-  {
-    id: 2, 
+    id: 1, 
     title: "Burung Migran",
     desc: "Pengamatan burung.",
-    image: "/images/Foto2.jpeg", 
+    image: "/images/FotoBurungMigrasi.jpg", 
     link: "/kategori/wisata/burung",
     // 👇 Logika CSS Kamu: span 2 kolom, span 2 baris (start 1, 3)
     className: "col-span-2 row-span-2"
   },
   {
-    id: 3,
+    id: 2,
     title: "Hutan Mangrove",
     desc: "Tracking hutan bakau.",
-    image: "/images/Foto3.jpeg",
+    image: "/images/FotoMangrove.jpg",
     link: "/kategori/wisata/mangrove",
     className: "col-span-2 row-span-2" 
   },
   {
-    id: 4,
+    id: 3,
     title: "Pantai Trisik",
     desc: "Sunset pasir hitam.",
-    image: "/images/Foto4.jpeg",
+    image: "/images/FotoPantai.jpeg",
     link: "/kategori/wisata/pantai",
     className: "col-span-2 row-span-2"
   },
   {
-    id: 5,
+    id: 4,
     title: "Menara Pantau",
     desc: "View dari atas.",
-    image: "/images/Foto5.jpeg",
+    image: "/images/FotoMenaraPantau.jpg",
     link: "/kategori/wisata/menara",
     className: "col-span-2 row-span-2"
   },
   {
-    id: 6,
-    title: "Susur Sungai",
+    id: 5,
+    title: "Numpak Perahu",
     desc: "Wisata perahu.",
-    image: "/images/Foto6.jpg", // Perhatikan .jpg
-    link: "/kategori/wisata/susur-sungai",
+    image: "/images/FotoNumpakPerahu.jpeg", // Perhatikan .jpg
+    link: "/kategori/wisata/numpak-perahu",
     className: "col-span-2 row-span-2"
   },
 ]

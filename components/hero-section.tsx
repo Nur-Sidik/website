@@ -12,7 +12,7 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/Foto1.jpg"
+          src="/images/FotoPantai2.webp"
           alt="Hutan mangrove yang rimbun di Desa Banaran, Kulonprogo"
           fill
           className="object-cover"
@@ -20,10 +20,10 @@ export function HeroSection() {
           sizes="100vw"
         />
         {/* Dark overlay for readability */}
-        <div className="absolute inset-0 bg-mangrove-dark/50" aria-hidden="true" />
+        <div className="absolute inset-0 bg-mangrove-dark/20" aria-hidden="true" />
         {/* Bottom gradient fade */}
         <div
-          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-mangrove-dark/80 to-transparent"
+          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-mangrove-dark/10 to-transparent"
           aria-hidden="true"
         />
       </div>

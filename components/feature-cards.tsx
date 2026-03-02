@@ -1,5 +1,7 @@
+"use client"
+
 import Image from "next/image"
-import { Bird, Shell, TowerControl, Trees, Waves } from "lucide-react"
+import { Bird, Shell, TowerControl, Trees, Turtle, Waves } from "lucide-react"
 
 const features = [
   {
@@ -18,9 +20,16 @@ const features = [
   },
   {
     title: "Pantai Trisik",
-    description: "Nikmati keindahan pantai pasir putih dan ombak yang menenangkan",
+    description: "Keindahan pantai pasir putih dan ombak yang menenangkan",
     image: "/images/FotoPantai.jpeg",
     icon: Waves,
+    href: "#wisata",
+  },
+  {
+    title: "Konservasi Penyu",
+    description: "Ikut serta dalam pelestarian penyu di Pantai Trisik",
+    image: "/images/FotoPenyu.jpg",
+    icon: Turtle,
     href: "#wisata",
   },
   {
@@ -41,27 +50,22 @@ const features = [
 
 export function FeatureCards() {
   return (
-    // 👇 UBAH 1: Container jadi 6 Kolom di layar sedang/besar (md:grid-cols-6)
-    <div className="grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-6">
+    // 👇 KONFIGURASI GRID: 6 Kolom di Desktop (md:grid-cols-6)
+    <div className="grid w-full max-w-5xl grid-cols-1 gap-4 md:grid-cols-6 md:grid-rows-2">
       
       {features.map((feature, index) => {
-        // 👇 UBAH 2: Logika Posisi (3 Atas, 2 Bawah Tengah)
-        let gridPos = "md:col-span-2" // Default: Lebar 2 kolom
-        
-        // Geser kartu ke-4 (Index 3) ke tengah kiri
-        if (index === 3) gridPos += " md:col-start-2"
-        // Geser kartu ke-5 (Index 4) ke tengah kanan
-        if (index === 4) gridPos += " md:col-start-4"
+        // 👇 LOGIKA CSS GRID: Setiap kartu makan 2 kolom (12/2 = 3 kartu sebaris)
+        // Ini sesuai dengan .div3 s/d .div8 yang masing-masing punya grid-column: span 2
+        let gridPos = "md:col-span-2 md:row-span-3" 
 
         return (
           <a
             key={feature.title}
             href={feature.href}
-            // 👇 Masukkan variable gridPos ke sini
             className={`group relative flex flex-col overflow-hidden rounded-xl border border-primary-foreground/15 bg-primary-foreground/10 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-primary-foreground/25 hover:bg-primary-foreground/15 hover:shadow-2xl ${gridPos}`}
           >
             {/* Card Image */}
-            <div className="relative h-36 overflow-hidden sm:h-40">
+            <div className="relative h-32 overflow-hidden sm:h-36">
               <Image
                 src={feature.image}
                 alt={feature.title}
@@ -70,10 +74,10 @@ export function FeatureCards() {
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
               />
               <div
-                className="absolute inset-0 bg-gradient-to-t from-mangrove-dark/70 to-transparent"
+                className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"
                 aria-hidden="true"
               />
-              <div className="absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full bg-sand-beige/90 text-mangrove-dark shadow-md">
+              <div className="absolute bottom-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-sand-beige/90 text-mangrove-dark shadow-md">
                 <feature.icon className="h-4 w-4" aria-hidden="true" />
               </div>
             </div>
@@ -83,7 +87,7 @@ export function FeatureCards() {
               <h3 className="mb-1 text-sm font-bold text-primary-foreground">
                 {feature.title}
               </h3>
-              <p className="text-xs leading-relaxed text-primary-foreground/70">
+              <p className="text-[11px] leading-relaxed text-primary-foreground/70 line-clamp-2">
                 {feature.description}
               </p>
             </div>

@@ -1,8 +1,10 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, MapPin, Bird, Trees, Waves, TowerControl, Shell } from "lucide-react"
+import { ArrowRight, Bird, Trees, Waves, TowerControl, Shell, Ship, Turtle } from "lucide-react"
 
-// 👇 DAFTAR 6 WISATA (Sesuai Fotonya)
+// 👇 DAFTAR 6 WISATA (Data sudah rapi)
 const wisataItems = [
   {
     title: "Burung Migran",
@@ -29,6 +31,14 @@ const wisataItems = [
     tag: "Wisata"
   },
   {
+    title: "Wisata Penyu",
+    description: "Konservasi dan pelepasan tukik di pesisir.",
+    image: "/images/FotoPenyu.jpg",
+    link: "/kategori/wisata/penyu",
+    icon: Turtle,
+    tag: "Konservasi"
+  },
+  {
     title: "Menara Pantau",
     description: "Saksikan pemandangan Burung yang bermigrasi dari ketinggian.",
     image: "/images/FotoMenaraPantau.jpg",
@@ -39,9 +49,9 @@ const wisataItems = [
   {
     title: "Numpak Perahu",
     description: "Saksikan indahnya Mangrove dengan perahu tradisional.",
-    image: "/images/FotoNumpakPerahu.jpeg", // Perhatikan .jpeg
+    image: "/images/FotoNumpakPerahu.jpeg",
     link: "/kategori/wisata/numpak-perahu",
-    icon: Shell,
+    icon: Ship,
     tag: "Petualangan"
   },
 ]
@@ -53,25 +63,20 @@ export function WisataSection() {
         
         {/* Judul Section */}
         <div className="mx-auto max-w-2xl text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-mangrove-dark sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-[#1a5c38] sm:text-4xl">
             Destinasi Unggulan Desa Banaran
           </h2>
-          <p className="mt-4 text-lg leading-8 text-muted-foreground">
+          <p className="mt-4 text-lg leading-8 text-gray-600">
             Temukan berbagai pengalaman seru yang hanya ada di Desa Banaran
           </p>
         </div>
 
-        {/* 👇 GRID FEATURE CARDS (Gaya 3-2 yang kamu suka) */}
+        {/* 👇 GRID SYSTEM: 3 Atas, 3 Bawah (Sesuai CSS Grid 6 Kolom) */}
         <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-6">
           
-          {wisataItems.map((post, index) => {
-            // Logika Posisi (3 Atas, 2 Bawah Tengah)
+          {wisataItems.map((post) => {
+            // Setiap kartu memakan 2 kolom (6 / 2 = 3 kartu per baris)
             let gridPos = "md:col-span-2" 
-            
-            // Geser kartu ke-4 (Index 3) ke tengah kiri
-            if (index === 3) gridPos += " md:col-start-2"
-            // Geser kartu ke-5 (Index 4) ke tengah kanan
-            if (index === 4) gridPos += " md:col-start-4"
 
             return (
               <Link
@@ -92,19 +97,19 @@ export function WisataSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" aria-hidden="true" />
                   
                   {/* Ikon di Pojok Kiri Bawah */}
-                  <div className="absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full bg-sand-beige/90 text-mangrove-dark shadow-md">
+                  <div className="absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#faf8f5]/90 text-[#1a5c38] shadow-md">
                     {post.icon && <post.icon className="h-4 w-4" aria-hidden="true" />}
                   </div>
 
                   {/* Tag di Pojok Kanan Atas */}
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-mangrove-dark shadow-sm">
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-[#1a5c38] shadow-sm">
                     {post.tag}
                   </div>
                 </div>
 
                 {/* Konten Card */}
                 <div className="flex flex-1 flex-col p-5">
-                  <h3 className="mb-2 text-lg font-bold text-gray-900 group-hover:text-mangrove-green transition-colors">
+                  <h3 className="mb-2 text-lg font-bold text-gray-900 group-hover:text-[#1a5c38] transition-colors">
                     {post.title}
                   </h3>
                   <p className="text-sm leading-relaxed text-gray-600 mb-4 line-clamp-2">
@@ -112,7 +117,7 @@ export function WisataSection() {
                   </p>
                   
                   {/* Tombol Panah Kecil */}
-                  <div className="mt-auto flex items-center gap-1 text-xs font-bold text-mangrove-green uppercase tracking-wide group-hover:gap-2 transition-all">
+                  <div className="mt-auto flex items-center gap-1 text-xs font-bold text-[#1a5c38] uppercase tracking-wide group-hover:gap-2 transition-all">
                     Lihat Detail <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>

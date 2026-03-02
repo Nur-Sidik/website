@@ -11,7 +11,7 @@ const contactInfo = [
   {
     icon: Phone,
     label: "Telepon",
-    value: "+62 81-289-368-677",
+    value: "+62 812-893-686-77",
   },
   {
     icon: Mail,

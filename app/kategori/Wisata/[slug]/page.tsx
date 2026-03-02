@@ -15,7 +15,7 @@ const wisataData: Record<string, any> = {
         desc: "Fenomena tahunan ribuan burung migran yang singgah di pesisir Trisik.",
         content: "Setiap tahun, ribuan burung dari belahan bumi utara bermigrasi ke selatan untuk mencari kehangatan. Laguna Trisik menjadi tempat persinggahan favorit mereka. Waktu terbaik untuk pengamatan adalah bulan September - Desember.",
         ticket: "Gratis",
-        open: "06.00 - 18.00 WIB"
+        open: "09.00 - 16.00 WIB"
     },
     "pantai": {
         title: "Pantai Trisik",
@@ -23,7 +23,7 @@ const wisataData: Record<string, any> = {
         desc: "Pantai eksotis dengan pasir hitam berkilau dan ombak selatan yang gagah.",
         content: "Pantai Trisik menawarkan pemandangan laut selatan yang memukau. Selain wisata alam, pantai ini juga menjadi pusat kegiatan nelayan lokal. Anda bisa membeli ikan segar langsung dari perahu nelayan di pagi hari.",
         ticket: "Rp 5.000 / orang",
-        open: "24 Jam"
+        open: "09.00 - 18.00 WIB"
     },
     "menara": {
         title: "Menara Pantau",
@@ -31,7 +31,7 @@ const wisataData: Record<string, any> = {
         desc: "Nikmati pemandangan 360 derajat pesisir Kulon Progo dari ketinggian.",
         content: "Menara pantau yang menjadi spot foto favorit wisatawan. Dari atas sini, Anda bisa melihat garis pantai yang memanjang.",
         ticket: "Rp 2.000 / orang",
-        open: "08.00 - 17.00 WIB"
+        open: "09.00 - 18.00 WIB"
     },
     "mangrove": {
         title: "Hutan Mangrove",
@@ -39,7 +39,7 @@ const wisataData: Record<string, any> = {
         desc: "Jelajahi ekosistem mangrove yang asri.",
         content: "Hutan Mangrove Banaran menawarkan edukasi lingkungan...",
         ticket: "Rp 10.000",
-        open: "08.00 - 17.00 WIB"
+        open: "09.00 - 15.00 WIB"
     },
     "numpak-perahu": {
         title: "Numpak Perahu",
@@ -76,7 +76,7 @@ export default function WisataDetail() {
             <Navbar />
 
             {/* HEADER GAMBAR */}
-            <div className="relative h-[60vh] w-full bg-[#1a5c38]">
+            <div className="relative h-[60vh] w-full bg-[#1a5c38] flex items-center">
                 <Image
                     src={data.image}
                     alt={data.title}
@@ -84,17 +84,30 @@ export default function WisataDetail() {
                     className="object-cover"
                     priority
                 />
-                <div className="absolute inset-0 bg-black/40" />
+                {/* Overlay Gelap agar teks terbaca jelas */}
+                <div className="absolute inset-0 bg-black/50" />
 
-                <div className="absolute bottom-0 left-0 w-full p-8 md:p-16 text-white">
+                {/* Container Teks - Dibuat Tengah secara Vertikal */}
+                <div className="w-full relative z-10 px-6 md:px-16 text-white text-center md:text-left">
                     <div className="max-w-7xl mx-auto">
+
+                        {/* Tombol Kembali */}
                         <Link
                             href="/#destinasi"
-                            className="inline-flex items-center gap-2 text-sm hover:text-[#F4A460] mb-4 transition-colors">
-                            <ArrowLeft className="h-4 w-4" /> Kembali
+                            className="inline-flex items-center gap-2 text-sm font-medium hover:text-[#F4A460] mb-6 transition-colors bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm w-fit mx-auto md:mx-0"
+                        >
+                            <ArrowLeft className="h-4 w-4" /> Kembali ke Beranda
                         </Link>
-                        <h1 className="text-4xl md:text-6xl font-bold mb-4">{data.title}</h1>
-                        <p className="text-xl text-gray-200">{data.desc}</p>
+
+                        {/* Judul Besar */}
+                        <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight drop-shadow-md">
+                            {data.title}
+                        </h1>
+
+                        {/* Subjudul / Deskripsi Pendek */}
+                        <p className="text-xl md:text-2xl text-gray-100 font-light tracking-wide drop-shadow-sm">
+                            {data.desc}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -148,10 +161,6 @@ export default function WisataDetail() {
                                     <span className="font-medium text-gray-900">Desa Banaran, Galur, Kulon Progo</span>
                                 </div>
                             </div>
-
-                            <Link href="#" className="block w-full bg-[#1a5c38] text-white text-center py-3 rounded-lg font-bold hover:bg-[#144a2d] transition-colors mt-6">
-                                Petunjuk Arah (Maps)
-                            </Link>
                         </div>
                     </div>
                 </div>

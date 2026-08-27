@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { Bird, Shell, TowerControl, Trees, Turtle, Waves } from "lucide-react"
+import { Bird, Shell, Ship, TowerControl, Trees, Turtle, Waves } from "lucide-react"
 
 const features = [
   {
@@ -43,7 +43,7 @@ const features = [
     title: "Numpak Perahu",
     description: "Saksikan indahnya Mangrove dengan perahu tradisional",
     image: "/images/FotoNumpakPerahu.jpeg",
-    icon: Shell,
+    icon: Ship,
     href: "#wisata",
   },
 ]

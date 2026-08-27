@@ -36,7 +36,8 @@ const navLinks = [
     href: "#",
     subItems: [
         { label: "Kelompok Tani Hutan", href: "/komunitas/kth" },
-        { label: "Karang Taruna", href: "/komunitas/kt" },
+        { label: "Kelompok Darma Wisata", href: "/komunitas/pokdarwis" },
+        { label: "Kelompok Informasi Masyarakat", href: "/komunitas/kim" },
     ]
   },
   { label: "Struktural", href: "/struktural" },

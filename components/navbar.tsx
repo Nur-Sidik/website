@@ -40,8 +40,16 @@ const navLinks = [
         { label: "Kelompok Informasi Masyarakat", href: "/komunitas/kim" },
     ]
   },
-  { label: "Struktural", href: "/struktural" },
-  { label: "Informasi", href: "/informasi" },
+{ 
+    label: "Struktural", 
+    href: "#",
+    subItems: [
+        { label: "KTH Tirto Manunggal", href: "/struktural/kth" },
+        { label: "KIM Desa Banaran", href: "/struktural/kim" },
+        { label: "Pokdarwis", href: "/struktural/pokdarwis" },
+    ]
+  },
+  { label: "Informasi", href: "/informasi" }
 ]
 
 export function Navbar() {

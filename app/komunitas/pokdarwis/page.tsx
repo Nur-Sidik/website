@@ -12,7 +12,7 @@ export default function PokdarwisPage() {
       <Navbar />
 
       {/* 1. HERO SECTION - Teks di Tengah (Sesuai gaya KTH) */}
-      <div className="relative h-[70vh] w-full flex flex-col justify-start pt-32 md:justify-center md:pt-32 pb-12">
+      <div className="relative h-[50vh] w-full flex flex-col justify-center pt-32 pb-12">
         <Image
           src="/images/FotoPantai.jpeg" // Silakan ganti dengan foto yang sesuai
           alt="Kelompok Darma Wisata"

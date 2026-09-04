@@ -12,7 +12,7 @@ export default function KimPage() {
       <Navbar />
 
       {/* 1. HERO SECTION - KIM */}
-      <div className="relative h-[70vh] w-full flex flex-col justify-start pt-32 md:justify-center md:pt-32 pb-12">
+      <div className="relative h-[50vh] w-full flex flex-col justify-center pt-32 pb-12">
         <Image
           src="/images/Foto1.jpg" // Ganti dengan foto yang pas untuk KIM
           alt="KIM Desa Banaran"

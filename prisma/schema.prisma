@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Akun Admin Dashboard
+model Admin {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  username     String   @unique @db.VarChar(50)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admins")
+}
+
+// 2. Berita & Informasi
+model Article {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(255)
+  content   String   @db.Text
+  imageUrl  String   @map("image_url") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("articles")
+}
+
+// 3. Modul Wisata
+model Destination {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(150)
+  slug        String   @unique @db.VarChar(150)
+  description String   @db.Text
+  price       Decimal  @default(0.00) @db.Decimal(10, 2)
+  imageUrl    String   @map("image_url") @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("destinations")
+}
+
+// 4. Kelembagaan (KIM, KTH, Pokdarwis)
+enum OrgType {
+  KIM
+  KTH
+  POKDARWIS
+}
+
+model Organization {
+  id            Int      @id @default(autoincrement())
+  type          OrgType
+  name          String   @db.VarChar(150)
+  description   String   @db.Text
+  structureInfo String?  @map("structure_info") @db.Text
+  imageUrl      String   @map("image_url") @db.VarChar(255)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("organizations")
+}
+
+// 5. Produk UMKM
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(150)
+  slug        String   @unique @db.VarChar(150)
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  description String   @db.Text
+  imageUrl    String   @map("image_url") @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  orders      Order[]
+
+  @@map("products")
+}
+
+// 6. Log Pesanan WhatsApp
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  orderCode     String      @unique @map("order_code") @db.VarChar(50)
+  customerName  String      @map("customer_name") @db.VarChar(100)
+  customerPhone String      @map("customer_phone") @db.VarChar(20)
+  productId     Int         @map("product_id")
+  quantity      Int
+  totalPrice    Decimal     @map("total_price") @db.Decimal(10, 2)
+  status        OrderStatus @default(PENDING)
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("orders")
+}

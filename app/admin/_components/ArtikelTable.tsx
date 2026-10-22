@@ -1,53 +1,71 @@
-import Image from "next/image";
 import Link from "next/link";
-import { DeleteButton } from "@/components/delete-button";
+import Image from "next/image";
+import { DeleteButton } from "./DeleteButtons";
 import { deleteArticle } from "@/app/actions/delete";
 
 export function ArtikelTable({ articles }: { articles: any[] }) {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+            <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-bold text-gray-900">Daftar Berita & Informasi</h2>
-                <Link href="/admin/artikel/tambah" className="text-sm font-medium text-purple-600 hover:text-purple-700">
+                <Link
+                    href="/admin/artikel/tambah"
+                    className="text-xs font-semibold text-green-700 hover:underline"
+                >
                     Tambah Baru &rarr;
                 </Link>
             </div>
+
             <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-gray-600">
-                    <thead className="bg-gray-50 text-gray-700 uppercase font-semibold text-xs border-b border-gray-200">
+                <table className="w-full text-left text-xs text-gray-600">
+                    <thead className="bg-gray-50 text-gray-400 uppercase text-[10px]">
                         <tr>
-                            <th className="px-6 py-4">Foto</th>
-                            <th className="px-6 py-4">Judul Berita</th>
-                            <th className="px-6 py-4">Ringkasan</th>
-                            <th className="px-6 py-4">Aksi</th>
+                            <th className="py-3 px-4">Foto</th>
+                            <th className="py-3 px-4">Judul Berita</th>
+                            <th className="py-3 px-4">Ringkasan</th>
+                            <th className="py-3 px-4 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {articles.length === 0 ? (
                             <tr>
-                                <td colSpan={4} className="px-6 py-8 text-center text-gray-400">Belum ada artikel berita.</td>
+                                <td colSpan={4} className="py-6 text-center text-gray-400">
+                                    Belum ada berita.
+                                </td>
                             </tr>
                         ) : (
                             articles.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50 transition">
-                                    <td className="px-6 py-4">
-                                        <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
-                                            <Image src={item.imageUrl || "/images/FotoMangrove.jpg"} alt={item.title} fill className="object-cover" />
+                                <tr key={item.id} className="hover:bg-gray-50/50">
+                                    <td className="py-3 px-4">
+                                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                                            <Image
+                                                src={item.imageUrl || "/images/Foto2.jpg"}
+                                                alt={item.title}
+                                                fill
+                                                className="object-cover"
+                                            />
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 font-medium text-gray-900">
-                                        {item.title}
-                                        <p className="text-xs text-gray-400 mt-0.5">/{item.slug}</p>
+                                    <td className="py-3 px-4">
+                                        <p className="font-semibold text-gray-900">{item.title}</p>
+                                        <p className="text-[11px] text-gray-400">/{item.slug}</p>
                                     </td>
-                                    <td className="px-6 py-4 text-gray-500 max-w-xs truncate">{item.content}</td>
-                                    <td className="px-6 py-4 flex items-center gap-3">
+                                    <td className="py-3 px-4 text-gray-500 max-w-xs truncate">
+                                        {item.excerpt || item.content?.slice(0, 60)}
+                                    </td>
+                                    <td className="py-3 px-4 text-right">
                                         <Link
                                             href={`/admin/artikel/${item.id}/edit`}
-                                            className="text-xs font-semibold text-purple-600 hover:text-purple-800 transition"
+                                            className="text-blue-600 hover:underline font-semibold"
                                         >
                                             Edit
                                         </Link>
-                                        <DeleteButton id={item.id} itemType="artikel" onDelete={deleteArticle} />
+                                        <DeleteButton
+                                            id={item.id}
+                                            itemName={item.title}
+                                            itemType="Artikel"
+                                            onDeleteAction={deleteArticle}
+                                        />
                                     </td>
                                 </tr>
                             ))

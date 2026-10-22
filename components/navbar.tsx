@@ -112,13 +112,6 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             
             {/* Login Button (Desktop Only) */}
-            <div className="hidden md:block">
-              <Link href="/admin/login">
-                  <Button variant="outline" className="border-sand-beige text-sand-beige hover:bg-sand-beige hover:text-mangrove-dark rounded-full">
-                  Login Admin
-                  </Button>
-              </Link>
-            </div>
 
             {/* HAMBURGER MENU (Mobile Only) - POSISI KANAN */}
             <div className="md:hidden">
@@ -158,11 +151,6 @@ export function Navbar() {
                          )}
                       </div>
                     ))}
-                    <div className="mt-4 border-t border-white/20 pt-4">
-                        <Link href="/admin/login" className="flex items-center gap-2 px-4 py-2 text-sand-beige font-bold">
-                            <User className="h-5 w-5" /> Login Admin
-                        </Link>
-                    </div>
                   </div>
                 </SheetContent>
               </Sheet>

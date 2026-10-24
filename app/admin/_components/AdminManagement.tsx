@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, FormEvent } from "react";
 import { createAdmin, deleteAdmin } from "@/app/actions/manageAdmin";
 
 interface AdminUser {
@@ -13,9 +13,11 @@ interface AdminUser {
 export function AdminManagement({
   admins,
   currentAdminId,
+  isSuperAdmin,
 }: {
   admins: AdminUser[];
   currentAdminId: number;
+  isSuperAdmin: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +26,7 @@ export function AdminManagement({
 
   const isFull = admins.length >= 3;
 
-  async function handleAddAdmin(e: React.FormEvent<HTMLFormElement>) {
+  async function handleAddAdmin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage(null);
     const form = e.currentTarget;
@@ -69,24 +71,28 @@ export function AdminManagement({
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Maksimal 3 pengelola yang memiliki akses ke dashboard ini.
+            {isSuperAdmin
+              ? "Anda login sebagai Super Admin (memiliki hak penuh mengelola akun)."
+              : "Hanya Super Admin Banaran yang dapat menambah atau menghapus akun pengelola."}
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setMessage(null);
-            setIsOpen(true);
-          }}
-          disabled={isFull}
-          className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-[#1B4332] hover:bg-[#2D6A4F] rounded-lg shadow-sm transition disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
-        >
-          + Tambah Admin Baru
-        </button>
+        {/* Tombol Tambah hanya aktif & muncul untuk Super Admin */}
+        {isSuperAdmin && (
+          <button
+            type="button"
+            onClick={() => {
+              setMessage(null);
+              setIsOpen(true);
+            }}
+            disabled={isFull}
+            className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-[#1B4332] hover:bg-[#2D6A4F] rounded-lg shadow-sm transition disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
+          >
+            + Tambah Admin Baru
+          </button>
+        )}
       </div>
 
-      {/* Tabel Akun Admin */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-gray-600">
           <thead className="bg-gray-50 text-gray-700 uppercase text-[11px] font-semibold border-y border-gray-100">
@@ -94,16 +100,23 @@ export function AdminManagement({
               <th className="py-3 px-4">Nama Lengkap</th>
               <th className="py-3 px-4">Username</th>
               <th className="py-3 px-4">Terdaftar</th>
-              <th className="py-3 px-4 text-center">Aksi</th>
+              {isSuperAdmin && <th className="py-3 px-4 text-center">Aksi</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {admins.map((adm) => {
               const isSelf = adm.id === currentAdminId;
+              const isTargetSuperAdmin = adm.username === "Super Admin Banaran";
+
               return (
                 <tr key={adm.id} className="hover:bg-gray-50/50">
                   <td className="py-3 px-4 font-medium text-gray-900 flex items-center gap-2">
                     {adm.name}
+                    {isTargetSuperAdmin && (
+                      <span className="text-[10px] bg-purple-100 text-purple-800 font-semibold px-2 py-0.5 rounded-full border border-purple-200">
+                        Super Admin
+                      </span>
+                    )}
                     {isSelf && (
                       <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">
                         Anda
@@ -118,23 +131,27 @@ export function AdminManagement({
                       year: "numeric",
                     })}
                   </td>
-                  <td className="py-3 px-4 text-center">
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(adm.id, adm.username)}
-                      disabled={isSelf || admins.length <= 1 || isPending}
-                      title={
-                        isSelf
-                          ? "Tidak bisa menghapus akun yang sedang dipakai"
-                          : admins.length <= 1
-                          ? "Minimal harus tersisa 1 admin"
-                          : "Hapus akun ini"
-                      }
-                      className="text-xs font-medium text-red-600 hover:text-red-800 disabled:text-gray-300 disabled:cursor-not-allowed cursor-pointer transition"
-                    >
-                      Hapus
-                    </button>
-                  </td>
+
+                  {/* Kolom aksi hanya untuk Super Admin */}
+                  {isSuperAdmin && (
+                    <td className="py-3 px-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(adm.id, adm.username)}
+                        disabled={isSelf || isTargetSuperAdmin || isPending}
+                        title={
+                          isSelf
+                            ? "Tidak bisa menghapus akun sendiri"
+                            : isTargetSuperAdmin
+                            ? "Akun Super Admin tidak bisa dihapus"
+                            : "Hapus akun ini"
+                        }
+                        className="text-xs font-medium text-red-600 hover:text-red-800 disabled:text-gray-300 disabled:cursor-not-allowed cursor-pointer transition"
+                      >
+                        Hapus
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -142,13 +159,13 @@ export function AdminManagement({
         </table>
       </div>
 
-      {/* Modal Tambah Admin */}
-      {isOpen && (
+      {/* Modal Form Tambah Admin */}
+      {isOpen && isSuperAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-gray-100">
             <h3 className="text-lg font-bold text-gray-900 mb-1">Tambah Akun Admin</h3>
             <p className="text-xs text-gray-500 mb-4">
-              Akun baru akan mendapatkan hak akses penuh ke panel pengelola.
+              Akun baru akan mendapatkan hak akses ke dashboard pengelola konten.
             </p>
 
             {message && (
@@ -194,12 +211,12 @@ export function AdminManagement({
                     name="password"
                     required
                     placeholder="••••••••"
-                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-600 focus:outline-none"
+                    className="w-full px-3 py-2 pr-14 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-600 focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-gray-400 hover:text-gray-600 cursor-pointer"
                   >
                     {showPassword ? "Tutup" : "Lihat"}
                   </button>

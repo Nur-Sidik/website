@@ -55,6 +55,7 @@ model Organization {
   id            Int      @id @default(autoincrement())
   type          OrgType
   name          String   @db.VarChar(150)
+  slug          String   @unique @db.VarChar(150)
   description   String   @db.Text
   structureInfo String?  @map("structure_info") @db.Text
   imageUrl      String   @map("image_url") @db.VarChar(255)

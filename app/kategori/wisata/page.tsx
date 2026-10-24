@@ -57,7 +57,7 @@ export default async function WisataCatalogPage() {
                   </div>
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <Link
-                      href={`/kategori/Wisata/${item.slug}`}
+                      href={`/kategori/wisata/${item.slug}`}
                       className="inline-flex text-xs font-semibold text-emerald-800 hover:text-emerald-950"
                     >
                       Lihat Rincian &rarr;

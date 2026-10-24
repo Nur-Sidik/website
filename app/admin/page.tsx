@@ -11,12 +11,17 @@ import { AdminManagement } from "./_components/AdminManagement";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  // Ambil ID admin yang sedang login dari cookie JWT
+  // 1. Ambil data sesi admin yang sedang login dari cookie JWT
   const cookieStore = await cookies();
   const token = cookieStore.get("admin_token")?.value;
-  const session = token ? ((await verifyToken(token)) as { id: number } | null) : null;
-  const currentAdminId = session?.id || 0;
+  const session = token
+    ? ((await verifyToken(token)) as { id: number; username: string } | null)
+    : null;
 
+  const currentAdminId = session?.id || 0;
+  const isSuperAdmin = session?.username === "Super Admin Banaran";
+
+  // 2. Tarik semua data yang dibutuhkan dari database
   const [destinations, products, articles, admins] = await Promise.all([
     prisma.destination.findMany({
       orderBy: { createdAt: "desc" },
@@ -97,8 +102,12 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Kelola Pengguna Admin (Maksimal 3 Akun) */}
-        <AdminManagement admins={admins} currentAdminId={currentAdminId} />
+        {/* Modul Kelola Pengguna Admin dengan Role Check */}
+        <AdminManagement
+          admins={admins}
+          currentAdminId={currentAdminId}
+          isSuperAdmin={isSuperAdmin}
+        />
 
         {/* Tabel Data Kelola Konten */}
         <DestinasiTable destinations={destinations} />

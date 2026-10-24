@@ -40,7 +40,7 @@ export default async function ProdukCatalogPage() {
                     className="object-cover group-hover:scale-105 transition duration-300"
                   />
                   <div className="absolute bottom-3 left-3 bg-emerald-800 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                    Rp {item.price.toLocaleString("id-ID")}
+                    Rp {Number(item.price).toLocaleString("id-ID")}
                   </div>
                 </div>
 

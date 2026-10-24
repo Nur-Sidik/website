@@ -6,9 +6,34 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 
+const SUPER_ADMIN_USERNAME = "Super Admin Banaran";
+
+// Helper internal untuk cek apakah yang request adalah Super Admin
+async function ensureSuperAdmin() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("admin_token")?.value;
+  if (!token) return { authorized: false, message: "Sesi telah berakhir." };
+
+  const session = (await verifyToken(token)) as { id: number; username: string } | null;
+  if (!session || session.username !== SUPER_ADMIN_USERNAME) {
+    return {
+      authorized: false,
+      message: "Akses ditolak! Hanya Super Admin Banaran yang berhak mengelola admin.",
+    };
+  }
+
+  return { authorized: true, session };
+}
+
 export async function createAdmin(formData: FormData) {
   try {
-    // 1. Validasi kuota maksimal 3 akun
+    // 1. Validasi hak akses Super Admin
+    const authCheck = await ensureSuperAdmin();
+    if (!authCheck.authorized) {
+      return { success: false, message: authCheck.message };
+    }
+
+    // 2. Validasi kuota maksimal 3 akun
     const totalAdmins = await prisma.admin.count();
     if (totalAdmins >= 3) {
       return {
@@ -25,7 +50,6 @@ export async function createAdmin(formData: FormData) {
       return { success: false, message: "Semua kolom wajib diisi." };
     }
 
-    // 2. Cek apakah username sudah dipakai
     const existing = await prisma.admin.findUnique({
       where: { username },
     });
@@ -33,7 +57,6 @@ export async function createAdmin(formData: FormData) {
       return { success: false, message: "Username sudah digunakan." };
     }
 
-    // 3. Hash password dengan bcrypt
     const passwordHash = await bcrypt.hash(password, 10);
 
     await prisma.admin.create({
@@ -54,23 +77,21 @@ export async function createAdmin(formData: FormData) {
 
 export async function deleteAdmin(targetId: number) {
   try {
-    // 1. Ambil identitas admin yang sedang login dari cookie sesi
-    const cookieStore = await cookies();
-    const token = cookieStore.get("admin_token")?.value;
-    if (!token) return { success: false, message: "Sesi tidak valid." };
-
-    const payload = (await verifyToken(token)) as { id: number } | null;
-    if (!payload) return { success: false, message: "Akses ditolak." };
-
-    // 2. Cegah admin menghapus dirinya sendiri
-    if (payload.id === targetId) {
-      return { success: false, message: "Anda tidak bisa menghapus akun sendiri yang sedang aktif." };
+    // 1. Validasi hak akses Super Admin
+    const authCheck = await ensureSuperAdmin();
+    if (!authCheck.authorized) {
+      return { success: false, message: authCheck.message };
     }
 
-    // 3. Cegah menghapus jika hanya tersisa 1 admin
+    // 2. Cegah Super Admin menghapus akunnya sendiri
+    if (authCheck.session?.id === targetId) {
+      return { success: false, message: "Akun Super Admin utama tidak boleh dihapus." };
+    }
+
+    // 3. Pastikan tidak menghapus jika admin tersisa 1
     const totalAdmins = await prisma.admin.count();
     if (totalAdmins <= 1) {
-      return { success: false, message: "Tidak dapat menghapus akun admin terakhir." };
+      return { success: false, message: "Tidak dapat menghapus admin terakhir." };
     }
 
     await prisma.admin.delete({

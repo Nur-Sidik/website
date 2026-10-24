@@ -33,12 +33,12 @@ export async function createAdmin(formData: FormData) {
       return { success: false, message: authCheck.message };
     }
 
-    // 2. Validasi kuota maksimal 3 akun
+    // 2. Validasi kuota maksimal 4 akun
     const totalAdmins = await prisma.admin.count();
-    if (totalAdmins >= 3) {
+    if (totalAdmins >= 4) {
       return {
         success: false,
-        message: "Batas maksimal admin tercapai (maksimal 3 akun).",
+        message: "Batas maksimal admin tercapai (maksimal 4 akun).",
       };
     }
 
@@ -102,5 +102,64 @@ export async function deleteAdmin(targetId: number) {
     return { success: true, message: "Akun admin berhasil dihapus!" };
   } catch (error: any) {
     return { success: false, message: error.message || "Gagal menghapus admin." };
+  }
+}
+
+export async function resetAdminPassword(formData: FormData) {
+  try {
+    // 1. Validasi hak akses: hanya Super Admin yang boleh reset
+    const authCheck = await ensureSuperAdmin();
+    if (!authCheck.authorized) {
+      return { success: false, message: authCheck.message };
+    }
+
+    const adminId = Number(formData.get("adminId"));
+    const newPassword = formData.get("newPassword") as string;
+
+    if (!adminId || !newPassword || newPassword.length < 6) {
+      return {
+        success: false,
+        message: "Password baru minimal harus 6 karakter.",
+      };
+    }
+
+    // 2. Ambil data admin target untuk verifikasi password lama
+    const targetAdmin = await prisma.admin.findUnique({
+      where: { id: adminId },
+      select: { password_hash: true },
+    });
+
+    if (!targetAdmin) {
+      return { success: false, message: "Akun admin tidak ditemukan." };
+    }
+
+    // 3. Cek apakah password baru sama dengan password lama
+    const isSamePassword = await bcrypt.compare(
+      newPassword,
+      targetAdmin.password_hash
+    );
+
+    if (isSamePassword) {
+      return {
+        success: false,
+        message: "Password baru tidak boleh sama dengan password sebelumnya.",
+      };
+    }
+
+    // 4. Hash password baru dan simpan
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await prisma.admin.update({
+      where: { id: adminId },
+      data: {
+        password_hash: passwordHash,
+      },
+    });
+
+    revalidatePath("/admin");
+    return { success: true, message: "Password admin berhasil diperbarui!" };
+  } catch (error: any) {
+    console.error("Error resetAdminPassword:", error);
+    return { success: false, message: "Gagal mereset password admin." };
   }
 }

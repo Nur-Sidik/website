@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { loginAdmin } from "@/app/actions/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isSessionExpired = searchParams.get("session") === "expired";
+
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -40,8 +43,30 @@ export default function LoginPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-xl sm:px-10 border border-gray-100">
+          {/* Notifikasi Sesi Berakhir */}
+          {isSessionExpired && !errorMessage && (
+            <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-xs font-medium flex items-start gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-4 h-4 text-amber-600 mt-0.5 shrink-0"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>
+                Sesi login telah berakhir demi keamanan. Silakan masukkan kembali username dan password Anda.
+              </span>
+            </div>
+          )}
+
+          {/* Notifikasi Error Kredensial Salah */}
           {errorMessage && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium">
+            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-xs font-medium">
               {errorMessage}
             </div>
           )}
@@ -79,7 +104,6 @@ export default function LoginPage() {
                   aria-label={showPassword ? "Sembunyikan sandi" : "Lihat sandi"}
                 >
                   {showPassword ? (
-                    // Ikon Eye-Off (Sembunyikan)
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -95,7 +119,6 @@ export default function LoginPage() {
                       />
                     </svg>
                   ) : (
-                    // Ikon Eye (Lihat)
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -131,5 +154,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center text-sm text-gray-500">Memuat...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

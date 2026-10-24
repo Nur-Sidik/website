@@ -1,16 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-interface DestinationItem {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  imageUrl: string;
-  price?: number | null;
-}
-
-export function WisataSection({ destinations }: { destinations: DestinationItem[] }) {
+export function WisataSection({ destinations }: { destinations: any[] }) {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,14 +15,14 @@ export function WisataSection({ destinations }: { destinations: DestinationItem[
             </p>
           </div>
           <Link
-            href="/kategori/Wisata"
+            href="/kategori/wisata"
             className="text-sm font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 transition"
           >
             Lihat Semua Wisata &rarr;
           </Link>
         </div>
 
-        {destinations.length === 0 ? (
+        {(!destinations || destinations.length === 0) ? (
           <div className="text-center py-12 text-sm text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
             Belum ada destinasi wisata yang dipublikasikan.
           </div>
@@ -51,7 +42,7 @@ export function WisataSection({ destinations }: { destinations: DestinationItem[
                   />
                   {item.price !== null && item.price !== undefined && (
                     <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                      Rp {item.price.toLocaleString("id-ID")}
+                      Rp {Number(item.price).toLocaleString("id-ID")}
                     </div>
                   )}
                 </div>
@@ -67,7 +58,7 @@ export function WisataSection({ destinations }: { destinations: DestinationItem[
                   </div>
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <Link
-                      href={`/kategori/Wisata/${item.slug}`}
+                      href={`/kategori/wisata/${item.slug}`}
                       className="inline-flex text-xs font-semibold text-emerald-800 hover:text-emerald-950"
                     >
                       Lihat Rincian &rarr;

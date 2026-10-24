@@ -1,39 +1,36 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
-
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || "desa-banaran-super-secret-key-2026"
-);
+import { verifyToken } from "@/lib/auth";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("admin_token")?.value;
 
-  // 1. Kunci semua rute yang dimulai dengan /admin
+  // Proteksi rute admin
   if (pathname.startsWith("/admin")) {
     if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      // Jika mencoba akses /admin tanpa token atau setelah token habis
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("session", "expired");
+      return NextResponse.redirect(loginUrl);
     }
 
-    try {
-      await jwtVerify(token, SECRET_KEY);
-      return NextResponse.next();
-    } catch (err) {
-      // Jika token kedaluwarsa atau dimanipulasi, lempar ke login
-      const response = NextResponse.redirect(new URL("/login", request.url));
+    const payload = await verifyToken(token);
+    if (!payload) {
+      // Jika token kedaluwarsa atau signature tidak valid
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("session", "expired");
+      const response = NextResponse.redirect(loginUrl);
       response.cookies.delete("admin_token");
       return response;
     }
   }
 
-  // 2. Jika sudah login dan mencoba buka /login lagi, arahkan balik ke dashboard
+  // Jika sudah login dan mencoba buka /login, lempar ke /admin
   if (pathname === "/login" && token) {
-    try {
-      await jwtVerify(token, SECRET_KEY);
+    const payload = await verifyToken(token);
+    if (payload) {
       return NextResponse.redirect(new URL("/admin", request.url));
-    } catch {
-      // Token tidak valid, biarkan di halaman login
     }
   }
 

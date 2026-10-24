@@ -37,9 +37,9 @@ export default async function AdminDashboardPage() {
         id: true,
         name: true,
         username: true,
-        created_at: true,
+        createdAt: true,
       },
-      orderBy: { created_at: "asc" },
+      orderBy: { createdAt: "asc" },
     }),
   ]);
 

@@ -52,7 +52,7 @@ export default async function DetailProdukPage({
                   {product.name}
                 </h1>
                 <p className="text-2xl font-black text-emerald-800 mb-6">
-                  Rp {product.price.toLocaleString("id-ID")}
+                  Rp {Number(product.price).toLocaleString("id-ID")}
                 </p>
               </div>
 

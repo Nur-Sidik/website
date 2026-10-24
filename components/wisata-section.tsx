@@ -1,74 +1,77 @@
+import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
 
-export function WisataSection({ destinations }: { destinations: any[] }) {
+export async function WisataSection() {
+  // 1. Ambil data destinasi langsung dari database MySQL
+  const destinations = await prisma.destination.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
-    <section className="py-16 bg-white">
+    <section className="py-12 bg-white" id="wisata">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-10">
-          <div>
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              Destinasi Wisata Unggulan
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Jelajahi keindahan alam dan ekowisata pesisir Desa Banaran.
-            </p>
-          </div>
-          <Link
-            href="/kategori/wisata"
-            className="text-sm font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 transition"
-          >
-            Lihat Semua Wisata &rarr;
-          </Link>
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
+            Destinasi Unggulan Desa Banaran
+          </h2>
+          <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
+            Temukan berbagai pengalaman seru dan keindahan alam yang hanya ada di Desa Banaran.
+          </p>
         </div>
 
-        {(!destinations || destinations.length === 0) ? (
-          <div className="text-center py-12 text-sm text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-            Belum ada destinasi wisata yang dipublikasikan.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {destinations.map((item) => (
+        {/* 2. Grid Render Dinamis */}
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {destinations.length === 0 ? (
+            <p className="text-center col-span-full text-gray-500">
+              Belum ada destinasi yang ditambahkan.
+            </p>
+          ) : (
+            destinations.map((item) => (
               <div
                 key={item.id}
-                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col"
+                className="flex flex-col rounded-lg shadow-lg overflow-hidden border border-gray-100"
               >
-                <div className="relative h-56 w-full bg-gray-100 overflow-hidden">
+                <div className="flex-shrink-0 relative h-48 w-full bg-gray-100">
                   <Image
-                    src={item.imageUrl}
+                    src={item.imageUrl || "/images/FotoPantai.jpeg"}
                     alt={item.name}
                     fill
-                    className="object-cover group-hover:scale-105 transition duration-300"
+                    className="object-cover"
                   />
-                  {item.price !== null && item.price !== undefined && (
-                    <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                      Rp {Number(item.price).toLocaleString("id-ID")}
-                    </div>
-                  )}
                 </div>
-
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-emerald-800 transition">
-                      {item.name}
-                    </h3>
-                    <p className="mt-2 text-xs text-gray-600 line-clamp-3 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex-1 bg-white p-6 flex flex-col justify-between">
+                  <div className="flex-1">
                     <Link
                       href={`/kategori/wisata/${item.slug}`}
-                      className="inline-flex text-xs font-semibold text-emerald-800 hover:text-emerald-950"
+                      className="block mt-2"
                     >
-                      Lihat Rincian &rarr;
+                      <h3 className="text-xl font-semibold text-gray-900 hover:text-green-600 transition">
+                        {item.name}
+                      </h3>
+                      <p className="mt-3 text-base text-gray-500 line-clamp-3">
+                        {item.description}
+                      </p>
+                    </Link>
+                  </div>
+                  <div className="mt-6 flex items-center justify-between">
+                    <span className="text-lg font-bold text-green-700">
+                      {Number(item.price) > 0
+                        ? `Rp ${Number(item.price).toLocaleString("id-ID")}`
+                        : "Gratis"}
+                    </span>
+                    <Link
+                      href={`/kategori/wisata/${item.slug}`}
+                      className="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-500"
+                    >
+                      Detail &rarr;
                     </Link>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
     </section>
   );

@@ -1,5 +1,4 @@
 import { HeroSection } from "@/components/hero-section";
-import { FeatureCards } from "@/components/feature-cards";
 import { WisataSection } from "@/components/wisata-section";
 import { ProdukSection } from "@/components/produk-section";
 import { KontakSection } from "@/components/kontak-section";
@@ -22,7 +21,6 @@ export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <HeroSection />
-      <FeatureCards />
       <WisataSection destinations={destinations} />
       <ProdukSection products={products} />
       <KontakSection />

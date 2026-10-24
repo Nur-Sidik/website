@@ -57,7 +57,7 @@ export async function createDestination(formData: FormData) {
 
         // Perbarui cache tampilan halaman depan
         revalidatePath("/");
-        revalidatePath("/kategori/Wisata");
+        revalidatePath("/kategori/wisata");
 
         return { success: true, message: "Destinasi berhasil ditambahkan!" };
     } catch (error: any) {
@@ -124,7 +124,7 @@ export async function updateDestination(id: number, formData: FormData) {
 
         revalidatePath("/");
         revalidatePath("/admin");
-        revalidatePath(`/kategori/Wisata/${slug}`);
+        revalidatePath(`/kategori/wisata/${slug}`);
 
         return { success: true, message: "Destinasi berhasil diperbarui!" };
     } catch (error: any) {

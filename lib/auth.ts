@@ -8,7 +8,7 @@ const SECRET_KEY = new TextEncoder().encode(
 export async function createSession(adminId: number, username: string, name: string) {
   const token = await new SignJWT({ id: adminId, username, name })
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("10m")
+    .setExpirationTime("5m")
     .sign(SECRET_KEY);
 
   const cookieStore = await cookies();
@@ -17,7 +17,7 @@ export async function createSession(adminId: number, username: string, name: str
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 10, // 10 menit
+    maxAge: 60 * 5, // 5 menit
   });
 }
 

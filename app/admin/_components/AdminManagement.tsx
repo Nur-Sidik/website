@@ -7,7 +7,7 @@ interface AdminUser {
   id: number;
   name: string;
   username: string;
-  created_at: Date;
+  createdAt: Date;
 }
 
 export function AdminManagement({
@@ -144,7 +144,7 @@ export function AdminManagement({
                   </td>
                   <td className="py-3 px-4 font-mono text-xs">{adm.username}</td>
                   <td className="py-3 px-4 text-xs text-gray-400">
-                    {new Date(adm.created_at).toLocaleDateString("id-ID", {
+                    {new Date(adm.createdAt).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",

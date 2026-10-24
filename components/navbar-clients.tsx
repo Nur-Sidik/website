@@ -19,8 +19,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 type Destination = { name: string; slug: string }
+type Organization = { name: string; slug: string; namaStruktural: string }
 
-export function NavbarClient({ destinations }: { destinations: Destination[] }) {
+export function NavbarClient({
+  destinations,
+  organizations,
+}: {
+  destinations: Destination[]
+  organizations: Organization[]
+}) {
   const [scrolled, setScrolled] = useState(false)
 
   const navLinks = [
@@ -39,20 +46,18 @@ export function NavbarClient({ destinations }: { destinations: Destination[] }) 
     {
       label: "Komunitas",
       href: "#",
-      subItems: [
-        { label: "Kelompok Tani Hutan", href: "/komunitas/kth" },
-        { label: "Kelompok Darma Wisata", href: "/komunitas/pokdarwis" },
-        { label: "Kelompok Informasi Masyarakat", href: "/komunitas/kim" },
-      ],
+      subItems: organizations.map((o) => ({
+        label: o.name,
+        href: `/komunitas/${o.slug}`,
+      })),
     },
     {
       label: "Struktural",
       href: "#",
-      subItems: [
-        { label: "KTH Tirto Manunggal", href: "/struktural/kth" },
-        { label: "KIM Desa Banaran", href: "/struktural/kim" },
-        { label: "Pokdarwis", href: "/struktural/pokdarwis" },
-      ],
+      subItems: organizations.map((o) => ({
+        label: o.namaStruktural,
+        href: `/struktural/${o.slug}`,
+      })),
     },
     { label: "Informasi", href: "/informasi" },
   ]
@@ -67,11 +72,10 @@ export function NavbarClient({ destinations }: { destinations: Destination[] }) 
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
           ? "bg-mangrove-dark/95 backdrop-blur-xl shadow-lg py-2"
           : "bg-transparent py-4"
-      }`}
+        }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">

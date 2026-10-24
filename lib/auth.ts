@@ -1,9 +1,13 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || "desa-banaran-super-secret-key-2026"
-);
+const secret = process.env.JWT_SECRET;
+
+if (!secret) {
+  throw new Error(" JWT_SECRET Kosong ");
+}
+
+const SECRET_KEY = new TextEncoder().encode(secret);
 
 export async function createSession(adminId: number, username: string, name: string) {
   const token = await new SignJWT({ id: adminId, username, name })

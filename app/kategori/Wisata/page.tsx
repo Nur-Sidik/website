@@ -1,106 +1,74 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { ArrowRight, MapPin } from "lucide-react"
+import prisma from "@/lib/prisma";
+import Image from "next/image";
+import Link from "next/link";
 
-// Data Wisata (Pastikan foto ada di public/images)
-const wisataItems = [
-  {
-    id: 1, 
-    title: "Burung Migran",
-    desc: "Pengamatan burung.",
-    image: "/images/FotoBurungMigrasi.jpg", 
-    link: "/kategori/wisata/burung",
-    // 👇 Logika CSS Kamu: span 2 kolom, span 2 baris (start 1, 3)
-    className: "col-span-2 row-span-2"
-  },
-  {
-    id: 2,
-    title: "Hutan Mangrove",
-    desc: "Tracking hutan bakau.",
-    image: "/images/FotoMangrove.jpg",
-    link: "/kategori/wisata/mangrove",
-    className: "col-span-2 row-span-2" 
-  },
-  {
-    id: 3,
-    title: "Pantai Trisik",
-    desc: "Sunset pasir hitam.",
-    image: "/images/FotoPantai.jpeg",
-    link: "/kategori/wisata/pantai",
-    className: "col-span-2 row-span-2"
-  },
-  {
-    id: 4,
-    title: "Menara Pantau",
-    desc: "View dari atas.",
-    image: "/images/FotoMenaraPantau.jpg",
-    link: "/kategori/wisata/menara",
-    className: "col-span-2 row-span-2"
-  },
-  {
-    id: 5,
-    title: "Numpak Perahu",
-    desc: "Wisata perahu.",
-    image: "/images/FotoNumpakPerahu.jpeg", // Perhatikan .jpg
-    link: "/kategori/wisata/numpak-perahu",
-    className: "col-span-2 row-span-2"
-  },
-]
+export const dynamic = "force-dynamic";
 
-export default function KategoriWisataPage() {
+export default async function WisataCatalogPage() {
+  const destinations = await prisma.destination.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
-    <main className="min-h-screen bg-[#faf8f5]">
-      <Navbar />
-      
-      {/* Header */}
-      <div className="pt-32 pb-12 px-6 text-center bg-[#1a5c38] text-white rounded-b-[3rem] shadow-xl">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[#F4A460]">Destinasi Wisata</h1>
-        <p className="max-w-xl mx-auto text-white/80">
-          Jelajahi keindahan alam Desa Banaran.
-        </p>
-      </div>
+    <main className="min-h-screen bg-gray-50/50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            Destinasi Wisata Desa Banaran
+          </h1>
+          <p className="mt-3 text-sm text-gray-600">
+            Kumpulan pesona wisata alam, hutan mangrove, dan pantai asri yang siap menyambut kunjungan Anda.
+          </p>
+        </div>
 
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        
-        {/* 👇 INI GRID SESUAI CSS KAMU (repeat(6, 1fr)) */}
-        {/* Di HP: 1 Kolom. Di Laptop (md): 6 Kolom */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-          
-          {wisataItems.map((item) => (
-            <Link 
-              href={item.link} 
-              key={item.id}
-              // className di sini akan mengambil 'col-span-2' dari data di atas
-              className={`group relative overflow-hidden rounded-2xl bg-gray-200 border-2 border-transparent hover:border-[#F4A460] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 ${item.className}`}
-            >
-              {/* Gambar (Isi Penuh Kotak) */}
-              <div className="absolute inset-0 w-full h-full">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              </div>
+        {destinations.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
+            <p className="text-sm text-gray-500">Belum ada destinasi yang ditambahkan.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {destinations.map((item) => (
+              <div
+                key={item.id}
+                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col"
+              >
+                <div className="relative h-56 w-full bg-gray-100 overflow-hidden">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition duration-300"
+                  />
+                  {item.price !== null && item.price !== undefined && (
+                    <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                      Rp {item.price.toLocaleString("id-ID")}
+                    </div>
+                  )}
+                </div>
 
-              {/* Teks Overlay */}
-              <div className="absolute bottom-0 left-0 p-6 text-white w-full bg-gradient-to-t from-black/80 to-transparent">
-                <h3 className="text-xl font-bold mb-1">{item.title}</h3>
-                <p className="text-xs text-white/80 line-clamp-2">{item.desc}</p>
-                <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ArrowRight className="h-4 w-4 text-[#F4A460]" />
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900 group-hover:text-emerald-800 transition">
+                      {item.name}
+                    </h2>
+                    <p className="mt-2 text-xs text-gray-600 line-clamp-3 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <Link
+                      href={`/kategori/Wisata/${item.slug}`}
+                      className="inline-flex text-xs font-semibold text-emerald-800 hover:text-emerald-950"
+                    >
+                      Lihat Rincian &rarr;
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </Link>
-          ))}
-
-        </div>
-      </section>
-
-      <Footer />
+            ))}
+          </div>
+        )}
+      </div>
     </main>
-  )
+  );
 }

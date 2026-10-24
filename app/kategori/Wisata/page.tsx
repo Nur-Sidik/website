@@ -41,7 +41,7 @@ export default async function WisataCatalogPage() {
                   />
                   {item.price !== null && item.price !== undefined && (
                     <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                      Rp {item.price.toLocaleString("id-ID")}
+                      Rp {Number(item.price).toLocaleString("id-ID")}
                     </div>
                   )}
                 </div>

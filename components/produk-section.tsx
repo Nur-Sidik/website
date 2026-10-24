@@ -1,16 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-interface ProductItem {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  image: string;
-  price: number;
-}
-
-export function ProdukSection({ products }: { products: ProductItem[] }) {
+export function ProdukSection({ products }: { products: any[] }) {
   return (
     <section className="py-16 bg-gray-50/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,7 +22,7 @@ export function ProdukSection({ products }: { products: ProductItem[] }) {
           </Link>
         </div>
 
-        {products.length === 0 ? (
+        {(!products || products.length === 0) ? (
           <div className="text-center py-12 text-sm text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
             Belum ada produk UMKM yang dipublikasikan.
           </div>
@@ -44,13 +35,13 @@ export function ProdukSection({ products }: { products: ProductItem[] }) {
               >
                 <div className="relative h-56 w-full bg-gray-100 overflow-hidden">
                   <Image
-                    src={item.image}
+                    src={item.imageUrl}
                     alt={item.name}
                     fill
                     className="object-cover group-hover:scale-105 transition duration-300"
                   />
                   <div className="absolute bottom-3 left-3 bg-emerald-800 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                    Rp {item.price.toLocaleString("id-ID")}
+                    Rp {Number(item.price).toLocaleString("id-ID")}
                   </div>
                 </div>
 

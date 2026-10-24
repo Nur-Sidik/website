@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition, FormEvent } from "react";
-import { createAdmin, deleteAdmin } from "@/app/actions/manageAdmin";
+import { useState, useTransition } from "react";
+import { createAdmin, deleteAdmin, resetAdminPassword } from "@/app/actions/manageAdmin";
 
 interface AdminUser {
   id: number;
@@ -20,13 +20,15 @@ export function AdminManagement({
   isSuperAdmin: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [resetTarget, setResetTarget] = useState<AdminUser | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [message, setMessage] = useState<{ text: string; isError: boolean } | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const isFull = admins.length >= 3;
+  const isFull = admins.length >= 4;
 
-  async function handleAddAdmin(e: FormEvent<HTMLFormElement>) {
+  async function handleAddAdmin(e: any) {
     e.preventDefault();
     setMessage(null);
     const form = e.currentTarget;
@@ -39,7 +41,24 @@ export function AdminManagement({
         setIsOpen(false);
         alert(res.message);
       } else {
-        setMessage({ text: res.message, isError: true });
+        setMessage({ text: res.message ?? "Terjadi kesalahan", isError: true });;
+      }
+    });
+  }
+
+  async function handleResetPassword(e: any) {
+    e.preventDefault();
+    setMessage(null);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    startTransition(async () => {
+      const res = await resetAdminPassword(formData);
+      if (res.success) {
+        setResetTarget(null);
+        alert(res.message);
+      } else {
+        setMessage({ text: res.message ?? "Terjadi kesalahan", isError: true });
       }
     });
   }
@@ -67,17 +86,17 @@ export function AdminManagement({
                   : "bg-blue-50 text-blue-700 border-blue-200"
               }`}
             >
-              {admins.length} / 3 Akun
+              {admins.length} / 4 Akun
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-1">
             {isSuperAdmin
-              ? "Anda login sebagai Super Admin (memiliki hak penuh mengelola akun)."
-              : "Hanya Super Admin Banaran yang dapat menambah atau menghapus akun pengelola."}
+              ? "Anda login sebagai Super Admin (memiliki hak menambah, menghapus, dan mereset sandi akun lain)."
+              : "Hanya Super Admin Banaran yang dapat menambah, menghapus, atau mereset sandi akun pengelola."}
           </p>
         </div>
 
-        {/* Tombol Tambah hanya aktif & muncul untuk Super Admin */}
+        {/* Tombol Tambah hanya muncul untuk Super Admin */}
         {isSuperAdmin && (
           <button
             type="button"
@@ -135,21 +154,37 @@ export function AdminManagement({
                   {/* Kolom aksi hanya untuk Super Admin */}
                   {isSuperAdmin && (
                     <td className="py-3 px-4 text-center">
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(adm.id, adm.username)}
-                        disabled={isSelf || isTargetSuperAdmin || isPending}
-                        title={
-                          isSelf
-                            ? "Tidak bisa menghapus akun sendiri"
-                            : isTargetSuperAdmin
-                            ? "Akun Super Admin tidak bisa dihapus"
-                            : "Hapus akun ini"
-                        }
-                        className="text-xs font-medium text-red-600 hover:text-red-800 disabled:text-gray-300 disabled:cursor-not-allowed cursor-pointer transition"
-                      >
-                        Hapus
-                      </button>
+                      <div className="flex items-center justify-center gap-3">
+                        {/* Tombol Reset Sandi */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMessage(null);
+                            setResetTarget(adm);
+                          }}
+                          disabled={isPending}
+                          className="text-xs font-medium text-amber-600 hover:text-amber-800 cursor-pointer transition"
+                        >
+                          Reset Sandi
+                        </button>
+
+                        {/* Tombol Hapus */}
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(adm.id, adm.username)}
+                          disabled={isSelf || isTargetSuperAdmin || isPending}
+                          title={
+                            isSelf
+                              ? "Tidak bisa menghapus akun sendiri"
+                              : isTargetSuperAdmin
+                              ? "Akun Super Admin tidak bisa dihapus"
+                              : "Hapus akun ini"
+                          }
+                          className="text-xs font-medium text-red-600 hover:text-red-800 disabled:text-gray-300 disabled:cursor-not-allowed cursor-pointer transition"
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -159,7 +194,7 @@ export function AdminManagement({
         </table>
       </div>
 
-      {/* Modal Form Tambah Admin */}
+      {/* Modal Tambah Admin */}
       {isOpen && isSuperAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-gray-100">
@@ -238,6 +273,68 @@ export function AdminManagement({
                   className="px-4 py-2 text-xs font-semibold text-white bg-[#1B4332] hover:bg-[#2D6A4F] rounded-lg transition disabled:bg-gray-400 cursor-pointer"
                 >
                   {isPending ? "Menyimpan..." : "Simpan Admin"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Reset Password */}
+      {resetTarget && isSuperAdmin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Reset Sandi Pengelola</h3>
+            <p className="text-xs text-gray-500 mb-4">
+              Ubah kata sandi untuk akun <span className="font-semibold text-gray-900">{resetTarget.name}</span> ({resetTarget.username}).
+            </p>
+
+            {message && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-xs font-medium">
+                {message.text}
+              </div>
+            )}
+
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <input type="hidden" name="adminId" value={resetTarget.id} />
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Password Baru
+                </label>
+                <div className="relative">
+                  <input
+                    type={showResetPassword ? "text" : "password"}
+                    name="newPassword"
+                    required
+                    placeholder="Minimal 6 karakter"
+                    className="w-full px-3 py-2 pr-14 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassword(!showResetPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-gray-400 hover:text-gray-600 cursor-pointer"
+                  >
+                    {showResetPassword ? "Tutup" : "Lihat"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setResetTarget(null)}
+                  disabled={isPending}
+                  className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="px-4 py-2 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition disabled:bg-gray-400 cursor-pointer"
+                >
+                  {isPending ? "Memperbarui..." : "Update Sandi"}
                 </button>
               </div>
             </form>

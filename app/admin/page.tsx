@@ -1,64 +1,110 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { verifyToken } from "@/lib/auth";
 import { DestinasiTable } from "./_components/DestinasiTable";
 import { ProdukTable } from "./_components/ProdukTable";
 import { ArtikelTable } from "./_components/ArtikelTable";
+import { LogoutButton } from "./_components/Logout";
+import { AdminManagement } from "./_components/AdminManagement";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const [destinations, products, articles] = await Promise.all([
-    prisma.destination.findMany({ orderBy: { createdAt: "desc" } }),
-    prisma.product.findMany({ orderBy: { createdAt: "desc" } }),
-    prisma.article.findMany({ orderBy: { createdAt: "desc" } }),
+  // Ambil ID admin yang sedang login dari cookie JWT
+  const cookieStore = await cookies();
+  const token = cookieStore.get("admin_token")?.value;
+  const session = token ? ((await verifyToken(token)) as { id: number } | null) : null;
+  const currentAdminId = session?.id || 0;
+
+  const [destinations, products, articles, admins] = await Promise.all([
+    prisma.destination.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.article.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.admin.findMany({
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        created_at: true,
+      },
+      orderBy: { created_at: "asc" },
+    }),
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        
-        {/* Header Dashboard */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+    <main className="min-h-screen bg-gray-50/50 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Dashboard & Tombol Logout */}
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard Panel Admin</h1>
-            <p className="text-sm text-gray-500">Kelola konten website Ecotourism Desa Banaran</p>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Dashboard Pengelola
+              </h1>
+              <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-green-200">
+                Admin Panel
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              Kelola informasi destinasi wisata, produk UMKM, dan artikel Desa Banaran.
+            </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/" className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-              Lihat Website
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              target="_blank"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg shadow-sm transition"
+            >
+              Lihat Web Publik &rarr;
             </Link>
-            <Link href="/admin/destinasi/tambah" className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition">
-              + Tambah Destinasi
-            </Link>
-            <Link href="/admin/product/tambah" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">
-              + Tambah Produk
-            </Link>
-            <Link href="/admin/artikel/tambah" className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition">
-              + Tambah Berita
-            </Link>
+            <LogoutButton />
           </div>
         </div>
 
-        {/* Kartu Metrik */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-medium text-gray-500">Total Destinasi Wisata</h3>
-            <p className="text-3xl font-bold text-green-600 mt-2">{destinations.length}</p>
+        {/* Ringkasan Statistik Singkat */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Total Destinasi
+            </p>
+            <p className="text-2xl font-bold text-gray-900 mt-2">
+              {destinations.length}
+            </p>
           </div>
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-medium text-gray-500">Total Produk UMKM</h3>
-            <p className="text-3xl font-bold text-blue-600 mt-2">{products.length}</p>
+          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Total Produk UMKM
+            </p>
+            <p className="text-2xl font-bold text-gray-900 mt-2">
+              {products.length}
+            </p>
           </div>
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-medium text-gray-500">Total Artikel & Berita</h3>
-            <p className="text-3xl font-bold text-purple-600 mt-2">{articles.length}</p>
+          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Total Artikel
+            </p>
+            <p className="text-2xl font-bold text-gray-900 mt-2">
+              {articles.length}
+            </p>
           </div>
         </div>
 
-        {/* Komponen Tabel Terpisah */}
+        {/* Kelola Pengguna Admin (Maksimal 3 Akun) */}
+        <AdminManagement admins={admins} currentAdminId={currentAdminId} />
+
+        {/* Tabel Data Kelola Konten */}
         <DestinasiTable destinations={destinations} />
         <ProdukTable products={products} />
         <ArtikelTable articles={articles} />
-
       </div>
-    </div>
+    </main>
   );
 }

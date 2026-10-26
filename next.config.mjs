@@ -2,8 +2,13 @@
 const nextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: '5mb',
+      bodySizeLimit: '6mb',
     },
+  },
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com" },
+    ],
   },
 };
 

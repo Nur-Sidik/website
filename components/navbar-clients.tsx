@@ -29,6 +29,13 @@ export function NavbarClient({
   organizations: Organization[]
 }) {
   const [scrolled, setScrolled] = useState(false)
+  // Menu dropdown (Radix) baru ditampilkan setelah halaman dimuat di browser,
+  // supaya ID-nya tidak beda antara server dan browser (peringatan hydration).
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const navLinks = [
     { label: "Beranda", href: "/" },
@@ -87,18 +94,24 @@ export function NavbarClient({
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) =>
               link.subItems ? (
-                <DropdownMenu key={link.label} modal={false}>
-                  <DropdownMenuTrigger className="flex items-center gap-1 text-white hover:text-sand-beige font-medium outline-none">
+                mounted ? (
+                  <DropdownMenu key={link.label} modal={false}>
+                    <DropdownMenuTrigger className="flex items-center gap-1 text-white hover:text-sand-beige font-medium outline-none">
+                      {link.label} <ChevronDown className="h-4 w-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-mangrove-dark border-sand-beige/20 text-white min-w-[200px] z-[60]">
+                      {link.subItems.map((sub) => (
+                        <DropdownMenuItem key={sub.label} asChild className="focus:bg-white/20 focus:text-white cursor-pointer">
+                          <Link href={sub.href}>{sub.label}</Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <span key={link.label} className="flex items-center gap-1 text-white font-medium">
                     {link.label} <ChevronDown className="h-4 w-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-mangrove-dark border-sand-beige/20 text-white min-w-[200px] z-[60]">
-                    {link.subItems.map((sub) => (
-                      <DropdownMenuItem key={sub.label} asChild className="focus:bg-white/20 focus:text-white cursor-pointer">
-                        <Link href={sub.href}>{sub.label}</Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  </span>
+                )
               ) : (
                 <Link key={link.href} href={link.href} className="text-white hover:text-sand-beige font-medium transition-colors">
                   {link.label}
@@ -109,6 +122,12 @@ export function NavbarClient({
 
           <div className="flex items-center gap-3">
             <div className="md:hidden">
+              {!mounted ? (
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+                  <Menu className="h-7 w-7" />
+                  <span className="sr-only">Buka Menu</span>
+                </Button>
+              ) : (
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
@@ -147,6 +166,7 @@ export function NavbarClient({
                   </div>
                 </SheetContent>
               </Sheet>
+              )}
             </div>
           </div>
         </div>

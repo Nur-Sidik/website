@@ -24,7 +24,7 @@ export async function loginAdmin(formData: FormData) {
         }
 
         // 2. Bandingkan password plaintext dengan password_hash di database
-        const isMatch = await bcrypt.compare(password, admin.password_hash);
+        const isMatch = await bcrypt.compare(password, admin.passwordHash);
         if (!isMatch) {
             return { success: false, message: "Username atau password salah." };
         }

@@ -2,8 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import fs from "fs/promises";
-import path from "path";
+import { uploadImage, deleteImage } from "@/lib/upload";
 
 export async function createDestination(formData: FormData) {
     try {
@@ -25,23 +24,13 @@ export async function createDestination(formData: FormData) {
 
         let imageUrl = "/images/FotoPantai.jpeg"; // Nilai default jika tidak upload foto
 
-        // Proses upload berkas jika ada foto yang dipilih
+        // Unggah foto ke Cloudinary jika ada foto yang dipilih
         if (imageFile && imageFile.size > 0) {
-            const bytes = await imageFile.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
-            // Beri nama berkas unik memakai timestamp
-            const fileExt = path.extname(imageFile.name) || ".jpg";
-            const fileName = `${Date.now()}-${slug}${fileExt}`;
-            const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-            // Pastikan folder uploads tersedia
-            await fs.mkdir(uploadDir, { recursive: true });
-
-            const filePath = path.join(uploadDir, fileName);
-            await fs.writeFile(filePath, buffer);
-
-            imageUrl = `/uploads/${fileName}`;
+            const upload = await uploadImage(imageFile, slug);
+            if (!upload.ok) {
+                return { success: false, message: upload.message };
+            }
+            imageUrl = upload.url;
         }
 
         // Simpan data destinasi ke database MySQL via Prisma
@@ -94,21 +83,15 @@ export async function updateDestination(id: number, formData: FormData) {
         }
 
         let imageUrl = existing.imageUrl;
+        let oldImageUrl: string | null = null;
 
         if (imageFile && imageFile.size > 0) {
-            const bytes = await imageFile.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
-            const fileExt = path.extname(imageFile.name) || ".jpg";
-            const fileName = `${Date.now()}-${slug}${fileExt}`;
-            const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-            await fs.mkdir(uploadDir, { recursive: true });
-
-            const filePath = path.join(uploadDir, fileName);
-            await fs.writeFile(filePath, buffer);
-
-            imageUrl = `/uploads/${fileName}`;
+            const upload = await uploadImage(imageFile, slug);
+            if (!upload.ok) {
+                return { success: false, message: upload.message };
+            }
+            oldImageUrl = existing.imageUrl; // foto lama dihapus setelah data berhasil disimpan
+            imageUrl = upload.url;
         }
 
         await prisma.destination.update({
@@ -121,6 +104,9 @@ export async function updateDestination(id: number, formData: FormData) {
                 imageUrl,
             },
         });
+
+        // Hapus foto lama di Cloudinary supaya tidak menumpuk
+        if (oldImageUrl) await deleteImage(oldImageUrl);
 
         revalidatePath("/");
         revalidatePath("/admin");

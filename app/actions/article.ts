@@ -2,8 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import fs from "fs/promises";
-import path from "path";
+import { uploadImage, deleteImage } from "@/lib/upload";
 
 export async function createArticle(formData: FormData) {
     try {
@@ -23,20 +22,13 @@ export async function createArticle(formData: FormData) {
 
         let imageUrl = "/images/FotoMangrove.jpg";
 
+        // Unggah foto ke Cloudinary jika ada foto yang dipilih
         if (imageFile && imageFile.size > 0) {
-            const bytes = await imageFile.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
-            const fileExt = path.extname(imageFile.name) || ".jpg";
-            const fileName = `${Date.now()}-${slug}${fileExt}`;
-            const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-            await fs.mkdir(uploadDir, { recursive: true });
-
-            const filePath = path.join(uploadDir, fileName);
-            await fs.writeFile(filePath, buffer);
-
-            imageUrl = `/uploads/${fileName}`;
+            const upload = await uploadImage(imageFile, slug);
+            if (!upload.ok) {
+                return { success: false, message: upload.message };
+            }
+            imageUrl = upload.url;
         }
 
         await prisma.article.create({
@@ -83,17 +75,15 @@ export async function updateArticle(id: number, formData: FormData) {
         if (!existing) return { success: false, message: "Artikel tidak ditemukan." };
 
         let imageUrl = existing.imageUrl;
+        let oldImageUrl: string | null = null;
 
         if (imageFile && imageFile.size > 0) {
-            const bytes = await imageFile.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-            const fileExt = path.extname(imageFile.name) || ".jpg";
-            const fileName = `${Date.now()}-${slug}${fileExt}`;
-            const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-            await fs.mkdir(uploadDir, { recursive: true });
-            await fs.writeFile(path.join(uploadDir, fileName), buffer);
-            imageUrl = `/uploads/${fileName}`;
+            const upload = await uploadImage(imageFile, slug);
+            if (!upload.ok) {
+                return { success: false, message: upload.message };
+            }
+            oldImageUrl = existing.imageUrl; // foto lama dihapus setelah data berhasil disimpan
+            imageUrl = upload.url;
         }
 
         await prisma.article.update({
@@ -106,10 +96,14 @@ export async function updateArticle(id: number, formData: FormData) {
             },
         });
 
+        // Hapus foto lama di Cloudinary supaya tidak menumpuk
+        if (oldImageUrl) await deleteImage(oldImageUrl);
+
         revalidatePath("/informasi");
         revalidatePath("/admin");
         return { success: true, message: "Artikel berhasil diperbarui!" };
     } catch (error) {
+        console.error("Gagal update artikel:", error);
         return { success: false, message: "Terjadi kesalahan pada server." };
     }
 }

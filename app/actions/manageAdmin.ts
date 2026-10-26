@@ -63,7 +63,7 @@ export async function createAdmin(formData: FormData) {
       data: {
         name,
         username,
-        password_hash: passwordHash,
+        passwordHash: passwordHash,
       },
     });
 
@@ -126,7 +126,7 @@ export async function resetAdminPassword(formData: FormData) {
     // 2. Ambil data admin target untuk verifikasi password lama
     const targetAdmin = await prisma.admin.findUnique({
       where: { id: adminId },
-      select: { password_hash: true },
+      select: { passwordHash: true },
     });
 
     if (!targetAdmin) {
@@ -136,7 +136,7 @@ export async function resetAdminPassword(formData: FormData) {
     // 3. Cek apakah password baru sama dengan password lama
     const isSamePassword = await bcrypt.compare(
       newPassword,
-      targetAdmin.password_hash
+      targetAdmin.passwordHash
     );
 
     if (isSamePassword) {

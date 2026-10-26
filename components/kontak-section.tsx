@@ -11,12 +11,12 @@ const contactInfo = [
   {
     icon: Phone,
     label: "Telepon",
-    value: "+62 812-893-686-77",
+    value: "+62 813-2845-2407",
   },
   {
     icon: Mail,
     label: "Email",
-    value: "info@desabanaran.id",
+    value: "kimdesabanaran@gmail.com",
   },
   {
     icon: Clock,

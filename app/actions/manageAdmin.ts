@@ -152,7 +152,7 @@ export async function resetAdminPassword(formData: FormData) {
     await prisma.admin.update({
       where: { id: adminId },
       data: {
-        password_hash: passwordHash,
+        passwordHash: passwordHash,
       },
     });
 

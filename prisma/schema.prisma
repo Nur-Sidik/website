@@ -51,19 +51,6 @@ enum OrgType {
   POKDARWIS
 }
 
-model Organization {
-  id            Int      @id @default(autoincrement())
-  type          OrgType
-  name          String   @db.VarChar(150)
-  slug          String   @unique @db.VarChar(150)
-  description   String   @db.Text
-  structureInfo String?  @map("structure_info") @db.Text
-  imageUrl      String   @map("image_url") @db.VarChar(255)
-  createdAt     DateTime @default(now()) @map("created_at")
-
-  @@map("organizations")
-}
-
 // 5. Produk UMKM
 model Product {
   id          Int      @id @default(autoincrement())
@@ -100,4 +87,52 @@ model Order {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("orders")
+}
+
+model Organization {
+  id            Int                  @id @default(autoincrement())
+  slug          String               @unique @db.VarChar(150)
+  name          String               @db.VarChar(150)
+  type          OrgType?
+  category      String?              @db.VarChar(50)
+  description   String               @db.Text
+  imageUrl      String?              @map("image_url") @db.VarChar(255)
+  structureInfo String?              @map("structure_info") @db.Text
+  groupImage    String?              @map("group_image") @db.VarChar(255)
+  leaderName    String?              @map("leader_name") @db.VarChar(150)
+  leaderTitle   String?              @map("leader_title") @db.VarChar(150)
+  leaderImage   String?              @map("leader_image") @db.VarChar(255)
+
+  news          OrganizationNews[]
+  members       OrganizationMember[]
+
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime?            @updatedAt @map("updated_at")
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             Int          @id @default(autoincrement())
+  organizationId Int          @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String       @db.VarChar(150)
+  role           String       @db.VarChar(150)
+  image          String?      @db.VarChar(255)
+  order          Int          @default(0)
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@map("organization_members")
+}
+
+model OrganizationNews {
+  id             Int          @id @default(autoincrement())
+  organizationId Int          @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  title          String       @db.VarChar(255)
+  content        String       @db.Text
+  image          String?      @db.VarChar(255)
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@map("organization_news")
 }

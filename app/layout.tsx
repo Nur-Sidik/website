@@ -9,7 +9,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: 'Desa Banaran',
-  description: 'Kata katanya ntar disini',
+  description: ' ',
 }
 
 export const viewport: Viewport = {

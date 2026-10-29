@@ -3,9 +3,15 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { uploadImage, deleteImage } from "@/lib/upload";
+import { getAdminSession } from "@/lib/auth";
 
 export async function createArticle(formData: FormData) {
     try {
+        const admin = await getAdminSession();
+        if (!admin) {
+            return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+        }
+
         const title = formData.get("title") as string;
         const content = formData.get("content") as string;
         const imageFile = formData.get("image") as File | null;
@@ -57,6 +63,11 @@ export async function createArticle(formData: FormData) {
 
 export async function updateArticle(id: number, formData: FormData) {
     try {
+        const admin = await getAdminSession();
+        if (!admin) {
+            return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+        }
+
         const title = formData.get("title") as string;
         const content = formData.get("content") as string;
         const imageFile = formData.get("image") as File | null;
@@ -105,21 +116,5 @@ export async function updateArticle(id: number, formData: FormData) {
     } catch (error) {
         console.error("Gagal update artikel:", error);
         return { success: false, message: "Terjadi kesalahan pada server." };
-    }
-}
-
-
-export async function deleteArticle(id: number) {
-    try {
-        await prisma.article.delete({
-            where: { id },
-        });
-
-        revalidatePath("/admin");
-        revalidatePath("/");
-        return { success: true, message: "Artikel berhasil dihapus!" };
-    } catch (error: any) {
-        console.error("Error deleteArticle:", error);
-        return { success: false, message: error.message || "Gagal menghapus artikel." };
     }
 }

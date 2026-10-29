@@ -1,187 +1,148 @@
-import Image from "next/image"
-import { notFound } from "next/navigation"
-import { Users, Briefcase } from "lucide-react"
-import prisma from "@/lib/prisma"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
+import prisma from "@/lib/prisma";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import { User } from "lucide-react";
 
-type Seksi = { nama: string; anggota: string[] }
+export const dynamic = "force-dynamic";
 
-type Struktur = {
-  namaStruktural: string
-  subjudul: string
-  ketua: string
-  sekretaris: string
-  bendahara: string
-  seksi: Seksi[]
-  anggota: string[]
-}
-
-function bacaStruktur(teks: string | null, namaCadangan: string): Struktur {
-  const kosong: Struktur = {
-    namaStruktural: namaCadangan,
-    subjudul: namaCadangan,
-    ketua: "-",
-    sekretaris: "-",
-    bendahara: "-",
-    seksi: [],
-    anggota: [],
-  }
-  if (!teks) return kosong
-  try {
-    return { ...kosong, ...JSON.parse(teks) }
-  } catch {
-    return kosong
-  }
+interface MemberItem {
+  id: string;
+  name: string;
+  role: string;
+  foto: string | null;
 }
 
 export default async function StrukturalPage({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params
+  const { slug } = await params;
 
   const org = await prisma.organization.findUnique({
     where: { slug },
-  })
+  });
 
-  if (!org) {
-    notFound()
-  }
+  if (!org) notFound();
 
-  const s = bacaStruktur(org.structureInfo, org.name)
+  let struct: any = {
+    namaStruktural: org.name,
+    subjudul: org.name,
+    ketua: "-",
+    fotoKetua: null,
+    sekretaris: "-",
+    fotoSekretaris: null,
+    bendahara: "-",
+    fotoBendahara: null,
+    members: [] as MemberItem[],
+  };
+
+  try {
+    if (org.structureInfo) {
+      struct = { ...struct, ...JSON.parse(org.structureInfo) };
+    }
+  } catch (e) {}
+
+  const members: MemberItem[] = struct.members || [];
 
   return (
-    <main className="min-h-screen bg-cream flex flex-col justify-between">
-      <Navbar />
-
-      {/* 1. HERO SECTION */}
-      <div className="relative min-h-[50vh] w-full flex flex-col justify-center pt-32 pb-12 bg-emerald-950 overflow-hidden">
-        {org.imageUrl ? (
-          <>
-            <Image
-              src={org.imageUrl}
-              alt={`Struktural ${org.name}`}
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-black/60" />
-          </>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-b from-[#143225] to-[#1B4332]" />
-        )}
-
-        <div className="relative z-10 w-full px-6 md:px-16 text-center md:text-left">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
-              Struktur Organisasi
-            </h1>
-            <h2 className="text-xl md:text-2xl text-gray-200 font-light drop-shadow-md mt-2">
-              {s.subjudul || org.name}
-            </h2>
-            {!org.imageUrl && (
-              <p className="mt-3 text-xs text-emerald-200/80 italic">
-                (Foto bersama kelompok belum diunggah oleh admin)
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 2. BAGAN STRUKTUR ORGANISASI */}
-      <div className="max-w-5xl mx-auto px-6 py-16 w-full">
-        <div className="text-center mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#F4A460] bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+    <main className="min-h-screen bg-gray-50/50 py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-12">
+        {/* Header Bagan */}
+        <div className="text-center space-y-2">
+          <span className="inline-block px-3 py-1 bg-amber-50 text-amber-800 text-xs font-bold uppercase tracking-widest rounded-full border border-amber-200">
             Bagan Kepengurusan
           </span>
-          <h2 className="text-3xl font-bold text-mangrove-dark mt-3">
-            Pengurus {s.namaStruktural}
-          </h2>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1B4332] tracking-tight">
+            Pengurus {struct.namaStruktural || org.name}
+          </h1>
         </div>
 
-        <div className="flex flex-col items-center space-y-8 relative">
-          {/* KETUA */}
-          <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border-2 border-mangrove-dark p-6 text-center relative z-10 flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center mb-4 text-xs text-gray-400 font-medium">
-              [ Foto Ketua ]
+        {/* Diagram Pohon Pejabat Inti */}
+        <div className="flex flex-col items-center">
+          {/* 1. KETUA */}
+          <div className="bg-white border-2 border-emerald-700/60 rounded-3xl p-6 sm:p-8 w-full max-w-sm text-center shadow-sm flex flex-col items-center">
+            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-100 border-2 border-emerald-600 flex items-center justify-center mb-4 shadow-inner">
+              {struct.fotoKetua ? (
+                <Image src={struct.fotoKetua} alt={struct.ketua} fill className="object-cover" />
+              ) : (
+                <User className="w-9 h-9 text-gray-400" />
+              )}
             </div>
-            <span className="text-xs font-bold text-[#F4A460] uppercase tracking-wider">Ketua</span>
-            <h3 className="text-xl font-extrabold text-gray-800 mt-1">{s.ketua}</h3>
+            <span className="text-xs font-bold text-amber-700 uppercase tracking-widest">
+              KETUA
+            </span>
+            <h3 className="text-xl font-black text-gray-900 mt-1">{struct.ketua}</h3>
           </div>
 
-          <div className="w-0.5 h-8 bg-gray-300 relative"></div>
+          <div className="w-0.5 h-10 bg-gray-300"></div>
 
-          {/* SEKRETARIS */}
-          <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-center relative z-10 flex flex-col items-center">
-            <div className="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 text-xs text-gray-400 font-medium">
-              [ Foto ]
+          {/* 2. SEKRETARIS */}
+          <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 w-full max-w-sm text-center shadow-sm flex flex-col items-center">
+            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-100 border border-gray-300 flex items-center justify-center mb-4 shadow-inner">
+              {struct.fotoSekretaris ? (
+                <Image src={struct.fotoSekretaris} alt={struct.sekretaris} fill className="object-cover" />
+              ) : (
+                <User className="w-9 h-9 text-gray-400" />
+              )}
             </div>
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Sekretaris</span>
-            <h3 className="text-lg font-bold text-gray-800 mt-1">{s.sekretaris}</h3>
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+              SEKRETARIS
+            </span>
+            <h3 className="text-lg font-bold text-gray-900 mt-1">{struct.sekretaris}</h3>
           </div>
 
-          <div className="w-0.5 h-8 bg-gray-300 relative"></div>
+          <div className="w-0.5 h-10 bg-gray-300"></div>
 
-          {/* BENDAHARA */}
-          <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-center relative z-10 flex flex-col items-center">
-            <div className="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 text-xs text-gray-400 font-medium">
-              [ Foto ]
+          {/* 3. BENDAHARA */}
+          <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 w-full max-w-sm text-center shadow-sm flex flex-col items-center">
+            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-100 border border-gray-300 flex items-center justify-center mb-4 shadow-inner">
+              {struct.fotoBendahara ? (
+                <Image src={struct.fotoBendahara} alt={struct.bendahara} fill className="object-cover" />
+              ) : (
+                <User className="w-9 h-9 text-gray-400" />
+              )}
             </div>
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Bendahara</span>
-            <h3 className="text-lg font-bold text-gray-800 mt-1">{s.bendahara}</h3>
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+              BENDAHARA
+            </span>
+            <h3 className="text-lg font-bold text-gray-900 mt-1">{struct.bendahara}</h3>
           </div>
+        </div>
 
-          {/* SEKSI-SEKSI */}
-          {s.seksi && s.seksi.length > 0 && (
-            <>
-              <div className="w-0.5 h-8 bg-gray-300 relative"></div>
+        {/* 4. DAFTAR SEKSI & ANGGOTA */}
+        {members.length > 0 && (
+          <div className="pt-8 space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-gray-900">
+                Divisi, Seksi & Anggota
+              </h2>
+              <div className="w-12 h-1 bg-emerald-600 mx-auto mt-2 rounded-full"></div>
+            </div>
 
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 relative pt-4">
-                <div className="absolute top-0 left-1/4 right-1/4 h-0.5 bg-gray-300 hidden md:block"></div>
-
-                {s.seksi.map((sie, i) => (
-                  <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center gap-2 mb-3 border-b pb-2">
-                      <Briefcase className="h-5 w-5 text-[#F4A460]" />
-                      <h4 className="font-bold text-mangrove-dark text-base">{sie.nama}</h4>
-                    </div>
-                    <ul className="space-y-2 text-sm text-gray-700 pl-2">
-                      {sie.anggota.map((nama, j) => (
-                        <li key={j}>{nama}</li>
-                      ))}
-                    </ul>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+              {members.map((m) => (
+                <div
+                  key={m.id}
+                  className="bg-white border border-gray-200 rounded-2xl p-5 text-center shadow-xs flex flex-col items-center hover:border-emerald-300 transition"
+                >
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center mb-3">
+                    {m.foto ? (
+                      <Image src={m.foto} alt={m.name} fill className="object-cover" />
+                    ) : (
+                      <User className="w-7 h-7 text-gray-400" />
+                    )}
                   </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* ANGGOTA */}
-          {s.anggota && s.anggota.length > 0 && (
-            <>
-              <div className="w-0.5 h-8 bg-gray-300 relative"></div>
-
-              <div className="w-full max-w-2xl bg-white rounded-xl shadow-md border border-gray-200 p-6">
-                <div className="flex items-center gap-2 mb-4 border-b pb-3">
-                  <Users className="h-6 w-6 text-mangrove-dark" />
-                  <h4 className="font-bold text-mangrove-dark text-lg">
-                    Anggota {s.namaStruktural}
-                  </h4>
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
+                    {m.role}
+                  </span>
+                  <h4 className="text-sm font-bold text-gray-900 mt-2">{m.name}</h4>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
-                  {s.anggota.map((nama, i) => (
-                    <div key={i}>{nama}</div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-
-      <Footer />
     </main>
-  )
+  );
 }

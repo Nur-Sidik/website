@@ -252,3 +252,100 @@ export async function deleteOrganizationNews(newsId: number, organizationId: num
     return { success: false, message: "Gagal menghapus berita." };
   }
 }
+
+export async function createOrganization(formData: FormData) {
+  try {
+    const name = formData.get("name") as string;
+    const slugRaw = formData.get("slug") as string;
+    const description = formData.get("description") as string;
+    const imageFile = formData.get("image") as File | null;
+
+    if (!name || !description) {
+      return { success: false, message: "Nama dan deskripsi kelompok wajib diisi." };
+    }
+
+    const slug = (slugRaw || name)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+
+    const existing = await prisma.organization.findUnique({ where: { slug } });
+    if (existing) {
+      return { success: false, message: `Slug atau kelompok "${slug}" sudah terdaftar.` };
+    }
+
+    let imageUrl: string | null = null;
+    if (imageFile && imageFile.size > 0) {
+      if (imageFile.size > 5 * 1024 * 1024) {
+        return { success: false, message: "Ukuran foto tidak boleh melebihi 5 MB." };
+      }
+      const upload = await uploadImage(imageFile, slug);
+      if (!upload.ok) {
+        return { success: false, message: upload.message || "Gagal mengunggah foto." };
+      }
+      imageUrl = upload.url;
+    }
+
+    const defaultStructure = {
+      namaStruktural: name,
+      subjudul: name,
+      ketua: "-",
+      sekretaris: "-",
+      bendahara: "-",
+      seksi: [],
+      anggota: [],
+    };
+
+    await prisma.organization.create({
+      data: {
+        name,
+        slug,
+        description,
+        imageUrl,
+        structureInfo: JSON.stringify(defaultStructure),
+      },
+    });
+
+    revalidatePath("/admin/organisasi");
+    revalidatePath("/");
+    return { success: true, message: `Komunitas "${name}" berhasil ditambahkan!` };
+  } catch (error: any) {
+    console.error("Gagal create organisasi:", error);
+    return { success: false, message: "Terjadi kesalahan server." };
+  }
+}
+
+export async function deleteOrganization(id: number) {
+  try {
+    const org = await prisma.organization.findUnique({
+      where: { id },
+      include: { news: true },
+    });
+
+    if (!org) {
+      return { success: false, message: "Organisasi tidak ditemukan." };
+    }
+
+    if (org.imageUrl && org.imageUrl.includes("cloudinary.com")) {
+      await deleteImage(org.imageUrl);
+    }
+
+    for (const n of org.news) {
+      if (n.image && n.image.includes("cloudinary.com")) {
+        await deleteImage(n.image);
+      }
+    }
+
+    await prisma.organization.delete({
+      where: { id },
+    });
+
+    revalidatePath("/admin/organisasi");
+    revalidatePath("/");
+    return { success: true, message: `Komunitas "${org.name}" berhasil dihapus!` };
+  } catch (error: any) {
+    console.error("Gagal delete organisasi:", error);
+    return { success: false, message: "Gagal menghapus organisasi." };
+  }
+}

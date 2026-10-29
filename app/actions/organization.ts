@@ -146,7 +146,7 @@ export async function updateOrganizationNews(newsId: number, organizationId: num
     const imageFile = formData.get("image") as File | null;
 
     if (!title || !content) {
-      return { success: false, message: "Judul dan isi berita wajib diisi." };
+      return { success: false, message: "Judul dan isi berita wajib diisi." };  
     }
 
     if (!eventDateRaw) {
@@ -347,5 +347,106 @@ export async function deleteOrganization(id: number) {
   } catch (error: any) {
     console.error("Gagal delete organisasi:", error);
     return { success: false, message: "Gagal menghapus organisasi." };
+  }
+}
+
+export async function updateOrganizationStructure(id: number, formData: FormData) {
+  try {
+    const org = await prisma.organization.findUnique({
+      where: { id },
+    });
+
+    if (!org) {
+      return { success: false, message: "Organisasi tidak ditemukan." };
+    }
+
+    let currentStruct: any = {
+      namaStruktural: org.name,
+      subjudul: org.name,
+      ketua: "-",
+      fotoKetua: null,
+      sekretaris: "-",
+      fotoSekretaris: null,
+      bendahara: "-",
+      fotoBendahara: null,
+      members: [],
+    };
+
+    try {
+      if (org.structureInfo) {
+        currentStruct = { ...currentStruct, ...JSON.parse(org.structureInfo) };
+      }
+    } catch (e) {}
+
+    const ketua = formData.get("ketua") as string;
+    const sekretaris = formData.get("sekretaris") as string;
+    const bendahara = formData.get("bendahara") as string;
+    const membersJson = formData.get("membersJson") as string;
+
+    const fotoKetuaFile = formData.get("fotoKetua") as File | null;
+    const fotoSekretarisFile = formData.get("fotoSekretaris") as File | null;
+    const fotoBendaharaFile = formData.get("fotoBendahara") as File | null;
+
+    let fotoKetuaUrl = currentStruct.fotoKetua || null;
+    let fotoSekretarisUrl = currentStruct.fotoSekretaris || null;
+    let fotoBendaharaUrl = currentStruct.fotoBendahara || null;
+
+    if (fotoKetuaFile && fotoKetuaFile.size > 0 && fotoKetuaFile.size <= 5 * 1024 * 1024) {
+      const upload = await uploadImage(fotoKetuaFile, `${org.slug}-ketua-${Date.now()}`);
+      if (upload.ok) {
+        if (fotoKetuaUrl && fotoKetuaUrl.includes("cloudinary.com")) await deleteImage(fotoKetuaUrl);
+        fotoKetuaUrl = upload.url;
+      }
+    }
+
+    if (fotoSekretarisFile && fotoSekretarisFile.size > 0 && fotoSekretarisFile.size <= 5 * 1024 * 1024) {
+      const upload = await uploadImage(fotoSekretarisFile, `${org.slug}-sekretaris-${Date.now()}`);
+      if (upload.ok) {
+        if (fotoSekretarisUrl && fotoSekretarisUrl.includes("cloudinary.com")) await deleteImage(fotoSekretarisUrl);
+        fotoSekretarisUrl = upload.url;
+      }
+    }
+
+    if (fotoBendaharaFile && fotoBendaharaFile.size > 0 && fotoBendaharaFile.size <= 5 * 1024 * 1024) {
+      const upload = await uploadImage(fotoBendaharaFile, `${org.slug}-bendahara-${Date.now()}`);
+      if (upload.ok) {
+        if (fotoBendaharaUrl && fotoBendaharaUrl.includes("cloudinary.com")) await deleteImage(fotoBendaharaUrl);
+        fotoBendaharaUrl = upload.url;
+      }
+    }
+
+    let parsedMembers = currentStruct.members || [];
+    if (membersJson) {
+      try {
+        parsedMembers = JSON.parse(membersJson);
+      } catch (e) {}
+    }
+
+    const updatedData = {
+      ...currentStruct,
+      ketua: ketua || "-",
+      fotoKetua: fotoKetuaUrl,
+      sekretaris: sekretaris || "-",
+      fotoSekretaris: fotoSekretarisUrl,
+      bendahara: bendahara || "-",
+      fotoBendahara: fotoBendaharaUrl,
+      members: parsedMembers,
+    };
+
+    await prisma.organization.update({
+      where: { id },
+      data: {
+        structureInfo: JSON.stringify(updatedData),
+      },
+    });
+
+    revalidatePath(`/struktural/${org.slug}`);
+    revalidatePath("/admin/organisasi");
+    revalidatePath(`/admin/organisasi/${id}/struktural`);
+
+    return { success: true, message: "Bagan & seluruh personel berhasil disimpan!" };
+  } catch (error: any) {
+    console.error("Gagal update struktural:", error);
+    return { success: false, message: "Terjadi kesalahan server saat menyimpan data." };
   }
 }

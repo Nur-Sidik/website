@@ -10,6 +10,7 @@ export async function updateOrganization(id: number, formData: FormData) {
   try {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
+    const structureInfo = formData.get("structureInfo") as string;
     const imageFile = formData.get("image") as File | null;
 
     if (!name || !description) {
@@ -43,6 +44,7 @@ export async function updateOrganization(id: number, formData: FormData) {
         name,
         description,
         imageUrl,
+        structureInfo: structureInfo || existing.structureInfo,
       },
     });
 
@@ -55,10 +57,10 @@ export async function updateOrganization(id: number, formData: FormData) {
     revalidatePath(`/admin/organisasi/${id}/edit`);
     revalidatePath("/admin/organisasi");
 
-    return { success: true, message: "Berhasil memperbarui organisasi." };
+    return { success: true, message: "Profil dan struktural berhasil diperbarui!" };
   } catch (error: any) {
     console.error("Gagal update organisasi:", error);
-    return { success: false, message: "Terjadi kesalahan server." };
+    return { success: false, message: "Terjadi kesalahan server saat menyimpan data." };
   }
 }
 
@@ -66,10 +68,33 @@ export async function createOrganizationNews(organizationId: number, formData: F
   try {
     const title = formData.get("title") as string;
     const content = formData.get("content") as string;
+    const eventDateRaw = formData.get("eventDate") as string;
     const imageFile = formData.get("image") as File | null;
 
     if (!title || !content) {
       return { success: false, message: "Judul dan isi berita wajib diisi." };
+    }
+
+    if (!eventDateRaw) {
+      return { success: false, message: "Tanggal pelaksanaan kegiatan wajib dipilih." };
+    }
+
+    const parsedDate = new Date(eventDateRaw);
+    if (isNaN(parsedDate.getTime())) {
+      return { success: false, message: "Format tanggal tidak valid." };
+    }
+
+    // Date constraint (tahun saat ini ± 1)
+    const currentYear = new Date().getFullYear();
+    const minYear = currentYear - 1;
+    const maxYear = currentYear + 1;
+    const eventYear = parsedDate.getFullYear();
+
+    if (eventYear < minYear || eventYear > maxYear) {
+      return {
+        success: false,
+        message: `Peringatan: Tahun kegiatan (${eventYear}) di luar batas rentang (${minYear} - ${maxYear})!`,
+      };
     }
 
     const org = await prisma.organization.findUnique({ where: { id: organizationId } });
@@ -98,6 +123,7 @@ export async function createOrganizationNews(organizationId: number, formData: F
         title,
         content,
         image: imageUrl,
+        eventDate: parsedDate,
       },
     });
 
@@ -109,6 +135,89 @@ export async function createOrganizationNews(organizationId: number, formData: F
   } catch (error: any) {
     console.error("Gagal membuat berita kegiatan:", error);
     return { success: false, message: "Terjadi kesalahan server." };
+  }
+}
+
+export async function updateOrganizationNews(newsId: number, organizationId: number, formData: FormData) {
+  try {
+    const title = formData.get("title") as string;
+    const content = formData.get("content") as string;
+    const eventDateRaw = formData.get("eventDate") as string;
+    const imageFile = formData.get("image") as File | null;
+
+    if (!title || !content) {
+      return { success: false, message: "Judul dan isi berita wajib diisi." };
+    }
+
+    if (!eventDateRaw) {
+      return { success: false, message: "Tanggal pelaksanaan kegiatan wajib dipilih." };
+    }
+
+    const parsedDate = new Date(eventDateRaw);
+    if (isNaN(parsedDate.getTime())) {
+      return { success: false, message: "Format tanggal tidak valid." };
+    }
+
+    const currentYear = new Date().getFullYear();
+    const minYear = currentYear - 1;
+    const maxYear = currentYear + 1;
+    const eventYear = parsedDate.getFullYear();
+
+    if (eventYear < minYear || eventYear > maxYear) {
+      return {
+        success: false,
+        message: `Peringatan: Tahun kegiatan (${eventYear}) di luar batas rentang (${minYear} - ${maxYear})!`,
+      };
+    }
+
+    const existingNews = await prisma.organizationNews.findUnique({
+      where: { id: newsId },
+      include: { organization: true },
+    });
+
+    if (!existingNews) {
+      return { success: false, message: "Data berita tidak ditemukan." };
+    }
+
+    let imageUrl = existingNews.image;
+    let oldImageUrl: string | null = null;
+
+    if (imageFile && imageFile.size > 0) {
+      if (imageFile.size > MAX_FILE_SIZE) {
+        return { success: false, message: "Ukuran foto berita tidak boleh melebihi 5 MB." };
+      }
+
+      const slugNews = `${existingNews.organization.slug}-news-${Date.now()}`;
+      const upload = await uploadImage(imageFile, slugNews);
+      if (!upload.ok) {
+        return { success: false, message: upload.message || "Gagal mengunggah foto baru." };
+      }
+      oldImageUrl = existingNews.image;
+      imageUrl = upload.url;
+    }
+
+    await prisma.organizationNews.update({
+      where: { id: newsId },
+      data: {
+        title,
+        content,
+        image: imageUrl,
+        eventDate: parsedDate,
+      },
+    });
+
+    if (oldImageUrl && oldImageUrl.includes("cloudinary.com")) {
+      await deleteImage(oldImageUrl);
+    }
+
+    revalidatePath(`/komunitas/${existingNews.organization.slug}`);
+    revalidatePath(`/struktural/${existingNews.organization.slug}`);
+    revalidatePath(`/admin/organisasi/${organizationId}/edit`);
+
+    return { success: true, message: "Berita kegiatan berhasil diperbarui!" };
+  } catch (error: any) {
+    console.error("Gagal update berita:", error);
+    return { success: false, message: "Terjadi kesalahan server saat memperbarui berita." };
   }
 }
 
@@ -137,7 +246,7 @@ export async function deleteOrganizationNews(newsId: number, organizationId: num
     }
     revalidatePath(`/admin/organisasi/${organizationId}/edit`);
 
-    return { success: true, message: "Berita berhasil dihapus." };
+    return { success: true, message: "Berita kegiatan berhasil dihapus!" };
   } catch (error: any) {
     console.error("Gagal menghapus berita:", error);
     return { success: false, message: "Gagal menghapus berita." };

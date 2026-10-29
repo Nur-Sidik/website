@@ -101,6 +101,7 @@ export default function AdminEditStrukturalPage() {
     loadData();
   }, [orgId]);
 
+  // Simpan juga objek file-nya ke dalam item
   function handleSaveMember(itemData: {
     id?: string;
     name: string;
@@ -108,29 +109,34 @@ export default function AdminEditStrukturalPage() {
     file: File | null;
     currentFoto: string | null;
   }) {
-    let fotoUrl = itemData.currentFoto;
+    let previewUrl = itemData.currentFoto;
     if (itemData.file) {
-      fotoUrl = URL.createObjectURL(itemData.file);
+      previewUrl = URL.createObjectURL(itemData.file);
     }
 
     if (itemData.id) {
       setMembers((prev) =>
-        prev.map((m) =>
+        prev.map((m: any) =>
           m.id === itemData.id
-            ? { ...m, name: itemData.name, role: itemData.role, foto: fotoUrl }
+            ? {
+              ...m,
+              name: itemData.name,
+              role: itemData.role,
+              foto: previewUrl,
+              rawFile: itemData.file || m.rawFile,
+            }
             : m
         )
       );
-      triggerAlert("success", `Data "${itemData.name}" diubah.`);
     } else {
-      const newMember: MemberItem = {
+      const newMember: any = {
         id: "mem_" + Date.now(),
         name: itemData.name,
         role: itemData.role,
-        foto: fotoUrl,
+        foto: previewUrl,
+        rawFile: itemData.file || null,
       };
       setMembers((prev) => [...prev, newMember]);
-      triggerAlert("success", `Anggota "${itemData.name}" ditambahkan.`);
     }
     setModalAnggota({ open: false, item: null });
   }
@@ -142,10 +148,26 @@ export default function AdminEditStrukturalPage() {
     }
   }
 
+  // Saat tombol simpan diklik, sertakan file tiap anggota ke FormData
   async function handleFinalSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    formData.set("membersJson", JSON.stringify(members));
+
+    // Bersihkan properti rawFile sebelum stringify JSON agar payload bersih
+    const cleanMembers = members.map((m: any) => ({
+      id: m.id,
+      name: m.name,
+      role: m.role,
+      foto: m.foto?.startsWith("blob:") ? null : m.foto,
+    }));
+    formData.set("membersJson", JSON.stringify(cleanMembers));
+
+    // Lampirkan file biner gambar tiap anggota jika ada
+    members.forEach((m: any) => {
+      if (m.rawFile) {
+        formData.append(`memberFile_${m.id}`, m.rawFile);
+      }
+    });
 
     startTransition(async () => {
       const res = await updateOrganizationStructure(orgId, formData);

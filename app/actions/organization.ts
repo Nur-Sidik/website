@@ -146,7 +146,7 @@ export async function updateOrganizationNews(newsId: number, organizationId: num
     const imageFile = formData.get("image") as File | null;
 
     if (!title || !content) {
-      return { success: false, message: "Judul dan isi berita wajib diisi." };  
+      return { success: false, message: "Judul dan isi berita wajib diisi." };
     }
 
     if (!eventDateRaw) {
@@ -376,7 +376,7 @@ export async function updateOrganizationStructure(id: number, formData: FormData
       if (org.structureInfo) {
         currentStruct = { ...currentStruct, ...JSON.parse(org.structureInfo) };
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const ketua = formData.get("ketua") as string;
     const sekretaris = formData.get("sekretaris") as string;
@@ -419,7 +419,7 @@ export async function updateOrganizationStructure(id: number, formData: FormData
     if (membersJson) {
       try {
         parsedMembers = JSON.parse(membersJson);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const updatedData = {

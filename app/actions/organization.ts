@@ -372,11 +372,11 @@ export async function updateOrganizationStructure(id: number, formData: FormData
       members: [],
     };
 
-    try {
-      if (org.structureInfo) {
+    if (org.structureInfo) {
+      try {
         currentStruct = { ...currentStruct, ...JSON.parse(org.structureInfo) };
-      }
-    } catch (e) {}
+      } catch (e) { }
+    }
 
     const ketua = formData.get("ketua") as string;
     const sekretaris = formData.get("sekretaris") as string;
@@ -391,39 +391,41 @@ export async function updateOrganizationStructure(id: number, formData: FormData
     let fotoSekretarisUrl = currentStruct.fotoSekretaris || null;
     let fotoBendaharaUrl = currentStruct.fotoBendahara || null;
 
-    // Upload Foto Ketua jika ada file baru diunggah
-    if (fotoKetuaFile && fotoKetuaFile.size > 0 && fotoKetuaFile.size <= 5 * 1024 * 1024) {
+    // 1. Upload Foto Pejabat Inti
+    if (fotoKetuaFile && fotoKetuaFile.size > 0) {
       const upload = await uploadImage(fotoKetuaFile, `${org.slug}-ketua-${Date.now()}`);
-      if (upload.ok) {
-        if (fotoKetuaUrl && fotoKetuaUrl.includes("cloudinary.com")) await deleteImage(fotoKetuaUrl);
-        fotoKetuaUrl = upload.url;
-      }
+      if (upload.ok) fotoKetuaUrl = upload.url;
     }
 
-    // Upload Foto Sekretaris jika ada file baru diunggah
-    if (fotoSekretarisFile && fotoSekretarisFile.size > 0 && fotoSekretarisFile.size <= 5 * 1024 * 1024) {
+    if (fotoSekretarisFile && fotoSekretarisFile.size > 0) {
       const upload = await uploadImage(fotoSekretarisFile, `${org.slug}-sekretaris-${Date.now()}`);
-      if (upload.ok) {
-        if (fotoSekretarisUrl && fotoSekretarisUrl.includes("cloudinary.com")) await deleteImage(fotoSekretarisUrl);
-        fotoSekretarisUrl = upload.url;
-      }
+      if (upload.ok) fotoSekretarisUrl = upload.url;
     }
 
-    // Upload Foto Bendahara jika ada file baru diunggah
-    if (fotoBendaharaFile && fotoBendaharaFile.size > 0 && fotoBendaharaFile.size <= 5 * 1024 * 1024) {
+    if (fotoBendaharaFile && fotoBendaharaFile.size > 0) {
       const upload = await uploadImage(fotoBendaharaFile, `${org.slug}-bendahara-${Date.now()}`);
-      if (upload.ok) {
-        if (fotoBendaharaUrl && fotoBendaharaUrl.includes("cloudinary.com")) await deleteImage(fotoBendaharaUrl);
-        fotoBendaharaUrl = upload.url;
-      }
+      if (upload.ok) fotoBendaharaUrl = upload.url;
     }
 
-    // Parse array anggota dari form
-    let parsedMembers = currentStruct.members || [];
+    // 2. Parse & Upload Foto Anggota
+    let parsedMembers: any[] = [];
     if (membersJson) {
       try {
         parsedMembers = JSON.parse(membersJson);
-      } catch (e) {}
+      } catch (e) { }
+    }
+
+    // Loop tiap anggota: jika ada file foto baru yang di-append di FormData, upload ke Cloudinary
+    for (let i = 0; i < parsedMembers.length; i++) {
+      const m = parsedMembers[i];
+      const memberFile = formData.get(`memberFile_${m.id}`) as File | null;
+
+      if (memberFile && memberFile.size > 0) {
+        const uploadMember = await uploadImage(memberFile, `${org.slug}-member-${m.id}-${Date.now()}`);
+        if (uploadMember.ok) {
+          m.foto = uploadMember.url; // ganti URL blob sementara dengan URL permanen Cloudinary
+        }
+      }
     }
 
     const updatedData = {

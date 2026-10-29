@@ -376,7 +376,7 @@ export async function updateOrganizationStructure(id: number, formData: FormData
       if (org.structureInfo) {
         currentStruct = { ...currentStruct, ...JSON.parse(org.structureInfo) };
       }
-    } catch (e) { }
+    } catch (e) {}
 
     const ketua = formData.get("ketua") as string;
     const sekretaris = formData.get("sekretaris") as string;
@@ -391,6 +391,7 @@ export async function updateOrganizationStructure(id: number, formData: FormData
     let fotoSekretarisUrl = currentStruct.fotoSekretaris || null;
     let fotoBendaharaUrl = currentStruct.fotoBendahara || null;
 
+    // Upload Foto Ketua jika ada file baru diunggah
     if (fotoKetuaFile && fotoKetuaFile.size > 0 && fotoKetuaFile.size <= 5 * 1024 * 1024) {
       const upload = await uploadImage(fotoKetuaFile, `${org.slug}-ketua-${Date.now()}`);
       if (upload.ok) {
@@ -399,6 +400,7 @@ export async function updateOrganizationStructure(id: number, formData: FormData
       }
     }
 
+    // Upload Foto Sekretaris jika ada file baru diunggah
     if (fotoSekretarisFile && fotoSekretarisFile.size > 0 && fotoSekretarisFile.size <= 5 * 1024 * 1024) {
       const upload = await uploadImage(fotoSekretarisFile, `${org.slug}-sekretaris-${Date.now()}`);
       if (upload.ok) {
@@ -407,6 +409,7 @@ export async function updateOrganizationStructure(id: number, formData: FormData
       }
     }
 
+    // Upload Foto Bendahara jika ada file baru diunggah
     if (fotoBendaharaFile && fotoBendaharaFile.size > 0 && fotoBendaharaFile.size <= 5 * 1024 * 1024) {
       const upload = await uploadImage(fotoBendaharaFile, `${org.slug}-bendahara-${Date.now()}`);
       if (upload.ok) {
@@ -415,11 +418,12 @@ export async function updateOrganizationStructure(id: number, formData: FormData
       }
     }
 
+    // Parse array anggota dari form
     let parsedMembers = currentStruct.members || [];
     if (membersJson) {
       try {
         parsedMembers = JSON.parse(membersJson);
-      } catch (e) { }
+      } catch (e) {}
     }
 
     const updatedData = {

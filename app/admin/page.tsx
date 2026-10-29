@@ -21,8 +21,8 @@ export default async function AdminDashboardPage() {
   const currentAdminId = session?.id || 0;
   const isSuperAdmin = session?.username === "Super Admin Banaran";
 
-  // 2. Tarik semua data yang dibutuhkan dari database
-  const [destinations, products, articles, admins] = await Promise.all([
+  // 2. Tarik semua data dari database (termasuk organizations)
+  const [destinations, products, articles, admins, organizations] = await Promise.all([
     prisma.destination.findMany({
       orderBy: { createdAt: "desc" },
     }),
@@ -41,12 +41,15 @@ export default async function AdminDashboardPage() {
       },
       orderBy: { createdAt: "asc" },
     }),
+    prisma.organization.findMany({
+      select: { id: true },
+    }),
   ]);
 
   return (
     <main className="min-h-screen bg-gray-50/50 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Dashboard & Tombol Logout */}
+        {/* Header Dashboard & Tombol Aksi */}
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
           <div>
             <div className="flex items-center gap-3">
@@ -58,11 +61,19 @@ export default async function AdminDashboardPage() {
               </span>
             </div>
             <p className="text-sm text-gray-500 mt-1">
-              Kelola informasi destinasi wisata, produk UMKM, dan artikel Desa Banaran.
+              Kelola destinasi wisata, produk UMKM, artikel, dan profil komunitas Desa Banaran.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Tombol Kelola Organisasi */}
+            <Link
+              href="/admin/organisasi"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#1B4332] hover:bg-[#143225] rounded-lg shadow-sm transition"
+            >
+              Kelola Organisasi &rarr;
+            </Link>
+
             <Link
               href="/"
               target="_blank"
@@ -74,8 +85,8 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Ringkasan Statistik Singkat */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+        {/* Ringkasan Statistik (Grid 4 Kolom) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
               Total Destinasi
@@ -84,6 +95,7 @@ export default async function AdminDashboardPage() {
               {destinations.length}
             </p>
           </div>
+
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
               Total Produk UMKM
@@ -92,6 +104,7 @@ export default async function AdminDashboardPage() {
               {products.length}
             </p>
           </div>
+
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
               Total Artikel
@@ -100,6 +113,29 @@ export default async function AdminDashboardPage() {
               {articles.length}
             </p>
           </div>
+
+          {/* Kartu Organisasi */}
+          <Link
+            href="/admin/organisasi"
+            className="bg-white p-5 rounded-xl border border-emerald-100 hover:border-emerald-500 shadow-sm transition group flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-emerald-800 uppercase tracking-wider">
+                  Komunitas & Organisasi
+                </p>
+                <span className="text-[10px] text-emerald-600 font-semibold group-hover:underline">
+                  Kelola &rarr;
+                </span>
+              </div>
+              <p className="text-2xl font-bold text-gray-900 mt-2">
+                {organizations.length}
+              </p>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-2">
+              KTH, KIM, & Pokdarwis
+            </p>
+          </Link>
         </div>
 
         {/* Modul Kelola Pengguna Admin dengan Role Check */}

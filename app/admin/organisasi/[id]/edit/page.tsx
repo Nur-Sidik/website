@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, ChangeEvent } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -27,7 +27,6 @@ interface OrgData {
   slug: string;
   description: string;
   imageUrl: string | null;
-  structureInfo: string | null;
   news: NewsItem[];
 }
 
@@ -40,20 +39,17 @@ export default function EditOrganisasiClientPage() {
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
-  // Pop-up Notification State
   const [alertInfo, setAlertInfo] = useState<{
     show: boolean;
     type: "success" | "error";
     message: string;
   }>({ show: false, type: "success", message: "" });
 
-  // Modal Edit Berita State
   const [editModal, setEditModal] = useState<{
     open: boolean;
     item: NewsItem | null;
   }>({ open: false, item: null });
 
-  // Modal Konfirmasi Delete Berita State
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean;
     newsId: number | null;
@@ -63,7 +59,21 @@ export default function EditOrganisasiClientPage() {
   const minDateLimit = `${currentYear - 1}-01-01`;
   const maxDateLimit = `${currentYear + 1}-12-31`;
 
-  // Helper menampilkan alert
+  // Validasi ukuran foto sebelum upload (< 5 MB)
+  function handleImageValidation(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const maxBytes = 5 * 1024 * 1024; // 5 MB
+      if (file.size > maxBytes) {
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        alert(
+          `Ukuran file "${file.name}" terlalu besar (${sizeMB} MB)!\nMaksimal ukuran foto adalah 5 MB.`
+        );
+        e.target.value = ""; // Batalkan pilihan file
+      }
+    }
+  }
+
   function triggerAlert(type: "success" | "error", message: string) {
     setAlertInfo({ show: true, type, message });
     setTimeout(() => {
@@ -71,21 +81,21 @@ export default function EditOrganisasiClientPage() {
     }, 4500);
   }
 
-  // Load data awal dari API / Database
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const res = await fetch(`/api/organization/${orgId}`, { cache: "no-store" });
-        if (res.ok) {
-          const data = await res.json();
-          setOrg(data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+  async function loadData() {
+    try {
+      const res = await fetch(`/api/organization/${orgId}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setOrg(data);
       }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     loadData();
   }, [orgId]);
 
@@ -105,36 +115,10 @@ export default function EditOrganisasiClientPage() {
     );
   }
 
-  // Parse struktur bagan organisasi
-  let parsedStructure = {
-    namaStruktural: org.name,
-    subjudul: org.name,
-    ketua: "",
-    sekretaris: "",
-    bendahara: "",
-  };
-  try {
-    if (org.structureInfo) {
-      parsedStructure = { ...parsedStructure, ...JSON.parse(org.structureInfo) };
-    }
-  } catch (e) {
-    // default
-  }
-
-  // 1. Simpan Profil & Struktural
+  // 1. Simpan Profil Kelompok
   async function handleSaveProfile(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-
-    // susun JSON struktur
-    const updatedStructure = {
-      namaStruktural: formData.get("struct_nama") || org?.name,
-      subjudul: formData.get("struct_subjudul") || org?.name,
-      ketua: formData.get("struct_ketua") || "-",
-      sekretaris: formData.get("struct_sekretaris") || "-",
-      bendahara: formData.get("struct_bendahara") || "-",
-    };
-    formData.set("structureInfo", JSON.stringify(updatedStructure));
 
     startTransition(async () => {
       const res = await updateOrganization(orgId, formData);
@@ -158,17 +142,14 @@ export default function EditOrganisasiClientPage() {
       if (res.success) {
         triggerAlert("success", res.message);
         form.reset();
-        // Refresh state
-        const ref = await fetch(`/api/organization/${orgId}`);
-        const updated = await ref.json();
-        setOrg(updated);
+        await loadData();
       } else {
         triggerAlert("error", res.message);
       }
     });
   }
 
-  // 3. Update Berita yang Diedit
+  // 3. Update Berita
   async function handleUpdateNews(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!editModal.item) return;
@@ -179,16 +160,14 @@ export default function EditOrganisasiClientPage() {
       if (res.success) {
         triggerAlert("success", res.message);
         setEditModal({ open: false, item: null });
-        const ref = await fetch(`/api/organization/${orgId}`);
-        const updated = await ref.json();
-        setOrg(updated);
+        await loadData();
       } else {
         triggerAlert("error", res.message);
       }
     });
   }
 
-  // 4. Eksekusi Hapus Berita
+  // 4. Hapus Berita
   async function handleConfirmDelete() {
     if (!deleteConfirm.newsId) return;
 
@@ -197,9 +176,7 @@ export default function EditOrganisasiClientPage() {
       if (res.success) {
         triggerAlert("success", res.message);
         setDeleteConfirm({ open: false, newsId: null });
-        const ref = await fetch(`/api/organization/${orgId}`);
-        const updated = await ref.json();
-        setOrg(updated);
+        await loadData();
       } else {
         triggerAlert("error", res.message);
       }
@@ -208,11 +185,12 @@ export default function EditOrganisasiClientPage() {
 
   return (
     <div className="p-6 sm:p-10 max-w-5xl mx-auto space-y-8 relative">
-      {/* Pop-up Alert Notification */}
+      {/* Toast Alert Pop-up */}
       {alertInfo.show && (
         <div
-          className={`fixed top-6 right-6 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-2xl shadow-xl text-xs font-semibold text-white animate-in slide-in-from-top duration-300 ${alertInfo.type === "success" ? "bg-emerald-700" : "bg-red-600"
-            }`}
+          className={`fixed top-6 right-6 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-2xl shadow-xl text-xs font-semibold text-white animate-in slide-in-from-top duration-300 ${
+            alertInfo.type === "success" ? "bg-emerald-700" : "bg-red-600"
+          }`}
         >
           {alertInfo.type === "success" ? (
             <CheckCircle2 className="w-5 h-5 shrink-0" />
@@ -238,12 +216,12 @@ export default function EditOrganisasiClientPage() {
             </h1>
           </div>
           <p className="text-xs text-gray-500 mt-1 pl-8">
-            Edit foto, profil, struktur pengurus, dan kelola berita kegiatan.
+            Edit foto, profil, dan kelola berita kegiatan kelompok.
           </p>
         </div>
       </div>
 
-      {/* FORM 1: Profil & Struktural */}
+      {/* FORM 1: Profil Kelompok & Foto Utama */}
       <form onSubmit={handleSaveProfile} className="space-y-6">
         <section className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-5">
           <h2 className="text-sm font-bold text-gray-900 border-b pb-3">
@@ -272,6 +250,7 @@ export default function EditOrganisasiClientPage() {
                 type="file"
                 name="image"
                 accept="image/*"
+                onChange={handleImageValidation}
                 className="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
               />
             </div>
@@ -361,6 +340,7 @@ export default function EditOrganisasiClientPage() {
               type="file"
               name="image"
               accept="image/*"
+              onChange={handleImageValidation}
               className="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
             />
           </div>
@@ -375,7 +355,7 @@ export default function EditOrganisasiClientPage() {
         </form>
       </section>
 
-      {/* DAFTAR BERITA DENGAN EDIT & DELETE POP-UP */}
+      {/* SEKSI 3: DAFTAR BERITA */}
       <section className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm">
         <h2 className="text-sm font-bold text-gray-900 border-b pb-3 mb-4">
           3. Berita Kegiatan Terdaftar ({org.news.length})
@@ -414,7 +394,6 @@ export default function EditOrganisasiClientPage() {
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0">
-                  {/* Tombol Buka Pop-up Edit */}
                   <button
                     type="button"
                     onClick={() => setEditModal({ open: true, item })}
@@ -424,7 +403,6 @@ export default function EditOrganisasiClientPage() {
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
 
-                  {/* Tombol Buka Pop-up Hapus */}
                   <button
                     type="button"
                     onClick={() => setDeleteConfirm({ open: true, newsId: item.id })}
@@ -510,6 +488,7 @@ export default function EditOrganisasiClientPage() {
                   type="file"
                   name="image"
                   accept="image/*"
+                  onChange={handleImageValidation}
                   className="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
                 />
               </div>

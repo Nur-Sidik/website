@@ -3,9 +3,15 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { uploadImage, deleteImage } from "@/lib/upload";
+import { getAdminSession } from "@/lib/auth";
 
 export async function createDestination(formData: FormData) {
     try {
+        const admin = await getAdminSession();
+        if (!admin) {
+            return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+        }
+
         const name = formData.get("name") as string;
         const description = formData.get("description") as string;
         const priceRaw = formData.get("price") as string;
@@ -62,6 +68,11 @@ export async function createDestination(formData: FormData) {
 
 export async function updateDestination(id: number, formData: FormData) {
     try {
+        const admin = await getAdminSession();
+        if (!admin) {
+            return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+        }
+
         const name = formData.get("name") as string;
         const description = formData.get("description") as string;
         const priceRaw = formData.get("price") as string;
@@ -116,20 +127,5 @@ export async function updateDestination(id: number, formData: FormData) {
     } catch (error: any) {
         console.error("Gagal update destinasi:", error);
         return { success: false, message: "Terjadi kesalahan pada server." };
-    }
-}
-
-export async function deleteDestination(id: number) {
-    try {
-        await prisma.destination.delete({
-            where: { id },
-        });
-
-        revalidatePath("/admin");
-        revalidatePath("/");
-        return { success: true, message: "Destinasi berhasil dihapus!" };
-    } catch (error: any) {
-        console.error("Error deleteDestination:", error);
-        return { success: false, message: error.message || "Gagal menghapus destinasi." };
     }
 }

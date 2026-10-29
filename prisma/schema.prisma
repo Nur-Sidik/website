@@ -132,6 +132,7 @@ model OrganizationNews {
   title          String       @db.VarChar(255)
   content        String       @db.Text
   image          String?      @db.VarChar(255)
+  eventDate      DateTime     @default(now()) @map("event_date")
   createdAt      DateTime     @default(now()) @map("created_at")
 
   @@map("organization_news")

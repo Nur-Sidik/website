@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { v2 as cloudinary } from "cloudinary";
+import { getAdminSession } from "@/lib/auth";
 
 // Konfigurasi Cloudinary otomatis membaca environment variables
 cloudinary.config({
@@ -42,6 +43,11 @@ function extractPublicId(imageUrl: string | null | undefined): string | null {
 // 1. Hapus Artikel
 export async function deleteArticle(id: number) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
+
     const article = await prisma.article.findUnique({
       where: { id },
       select: { imageUrl: true },
@@ -76,6 +82,11 @@ export async function deleteArticle(id: number) {
 // 2. Hapus Destinasi Wisata
 export async function deleteDestination(id: number) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
+
     const destination = await prisma.destination.findUnique({
       where: { id },
       select: { imageUrl: true, slug: true },
@@ -109,6 +120,11 @@ export async function deleteDestination(id: number) {
 // 3. Hapus Produk UMKM
 export async function deleteProduct(id: number) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
+
     const product = await prisma.product.findUnique({
       where: { id },
       select: { imageUrl: true, slug: true },

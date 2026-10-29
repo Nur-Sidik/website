@@ -17,7 +17,6 @@ type Struktur = {
   anggota: string[]
 }
 
-// Membaca data pengurus dari database. Kalau kosong atau rusak, pakai isi cadangan.
 function bacaStruktur(teks: string | null, namaCadangan: string): Struktur {
   const kosong: Struktur = {
     namaStruktural: namaCadangan,
@@ -57,30 +56,41 @@ export default async function StrukturalPage({
     <main className="min-h-screen bg-cream flex flex-col justify-between">
       <Navbar />
 
-      {/* HERO SECTION */}
-      <div className="relative h-[50vh] w-full flex flex-col justify-center pt-32 pb-12">
-        <Image
-          src={org.imageUrl}
-          alt={`Struktural ${org.name}`}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/60" />
+      {/* 1. HERO SECTION */}
+      <div className="relative min-h-[50vh] w-full flex flex-col justify-center pt-32 pb-12 bg-emerald-950 overflow-hidden">
+        {org.imageUrl ? (
+          <>
+            <Image
+              src={org.imageUrl}
+              alt={`Struktural ${org.name}`}
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-b from-[#143225] to-[#1B4332]" />
+        )}
 
         <div className="relative z-10 w-full px-6 md:px-16 text-center md:text-left">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl md:text-5xl font-bold mb-2 text-white drop-shadow-lg">
+            <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
               Struktur Organisasi
             </h1>
-            <p className="text-lg md:text-xl text-gray-200 font-light drop-shadow-md">
-              {s.subjudul}
-            </p>
+            <h2 className="text-xl md:text-2xl text-gray-200 font-light drop-shadow-md mt-2">
+              {s.subjudul || org.name}
+            </h2>
+            {!org.imageUrl && (
+              <p className="mt-3 text-xs text-emerald-200/80 italic">
+                (Foto bersama kelompok belum diunggah oleh admin)
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* BAGAN STRUKTUR ORGANISASI */}
+      {/* 2. BAGAN STRUKTUR ORGANISASI */}
       <div className="max-w-5xl mx-auto px-6 py-16 w-full">
         <div className="text-center mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-[#F4A460] bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
@@ -92,7 +102,7 @@ export default async function StrukturalPage({
         </div>
 
         <div className="flex flex-col items-center space-y-8 relative">
-          {/* 1. KETUA */}
+          {/* KETUA */}
           <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border-2 border-mangrove-dark p-6 text-center relative z-10 flex flex-col items-center">
             <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center mb-4 text-xs text-gray-400 font-medium">
               [ Foto Ketua ]
@@ -103,7 +113,7 @@ export default async function StrukturalPage({
 
           <div className="w-0.5 h-8 bg-gray-300 relative"></div>
 
-          {/* 2. SEKRETARIS */}
+          {/* SEKRETARIS */}
           <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-center relative z-10 flex flex-col items-center">
             <div className="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 text-xs text-gray-400 font-medium">
               [ Foto ]
@@ -114,7 +124,7 @@ export default async function StrukturalPage({
 
           <div className="w-0.5 h-8 bg-gray-300 relative"></div>
 
-          {/* 3. BENDAHARA */}
+          {/* BENDAHARA */}
           <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-center relative z-10 flex flex-col items-center">
             <div className="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 text-xs text-gray-400 font-medium">
               [ Foto ]
@@ -123,8 +133,8 @@ export default async function StrukturalPage({
             <h3 className="text-lg font-bold text-gray-800 mt-1">{s.bendahara}</h3>
           </div>
 
-          {/* 4. SEKSI-SEKSI */}
-          {s.seksi.length > 0 && (
+          {/* SEKSI-SEKSI */}
+          {s.seksi && s.seksi.length > 0 && (
             <>
               <div className="w-0.5 h-8 bg-gray-300 relative"></div>
 
@@ -139,7 +149,7 @@ export default async function StrukturalPage({
                     </div>
                     <ul className="space-y-2 text-sm text-gray-700 pl-2">
                       {sie.anggota.map((nama, j) => (
-                        <li key={j}>• {nama}</li>
+                        <li key={j}>{nama}</li>
                       ))}
                     </ul>
                   </div>
@@ -148,8 +158,8 @@ export default async function StrukturalPage({
             </>
           )}
 
-          {/* 5. ANGGOTA */}
-          {s.anggota.length > 0 && (
+          {/* ANGGOTA */}
+          {s.anggota && s.anggota.length > 0 && (
             <>
               <div className="w-0.5 h-8 bg-gray-300 relative"></div>
 
@@ -162,7 +172,7 @@ export default async function StrukturalPage({
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
                   {s.anggota.map((nama, i) => (
-                    <div key={i}>• {nama}</div>
+                    <div key={i}>{nama}</div>
                   ))}
                 </div>
               </div>

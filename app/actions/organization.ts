@@ -3,11 +3,16 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { uploadImage, deleteImage } from "@/lib/upload";
+import { getAdminSession } from "@/lib/auth";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export async function updateOrganization(id: number, formData: FormData) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const structureInfo = formData.get("structureInfo") as string;
@@ -66,6 +71,10 @@ export async function updateOrganization(id: number, formData: FormData) {
 
 export async function createOrganizationNews(organizationId: number, formData: FormData) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
     const title = formData.get("title") as string;
     const content = formData.get("content") as string;
     const eventDateRaw = formData.get("eventDate") as string;
@@ -140,6 +149,10 @@ export async function createOrganizationNews(organizationId: number, formData: F
 
 export async function updateOrganizationNews(newsId: number, organizationId: number, formData: FormData) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
     const title = formData.get("title") as string;
     const content = formData.get("content") as string;
     const eventDateRaw = formData.get("eventDate") as string;
@@ -223,6 +236,10 @@ export async function updateOrganizationNews(newsId: number, organizationId: num
 
 export async function deleteOrganizationNews(newsId: number, organizationId: number) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
     const news = await prisma.organizationNews.findUnique({
       where: { id: newsId },
     });
@@ -255,6 +272,10 @@ export async function deleteOrganizationNews(newsId: number, organizationId: num
 
 export async function createOrganization(formData: FormData) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
     const name = formData.get("name") as string;
     const slugRaw = formData.get("slug") as string;
     const description = formData.get("description") as string;
@@ -318,6 +339,10 @@ export async function createOrganization(formData: FormData) {
 
 export async function deleteOrganization(id: number) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
     const org = await prisma.organization.findUnique({
       where: { id },
       include: { news: true },
@@ -352,6 +377,10 @@ export async function deleteOrganization(id: number) {
 
 export async function updateOrganizationStructure(id: number, formData: FormData) {
   try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      return { success: false, message: "Sesi login berakhir. Silakan login ulang." };
+    }
     const org = await prisma.organization.findUnique({
       where: { id },
     });

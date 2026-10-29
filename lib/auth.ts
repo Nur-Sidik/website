@@ -38,3 +38,12 @@ export async function verifyToken(token: string) {
     return null;
   }
 }
+
+// Mengecek apakah pemanggil fungsi ini adalah admin yang sedang login.
+// Mengembalikan data sesi kalau valid, atau null kalau belum login / sesi habis.
+export async function getAdminSession() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("admin_token")?.value;
+  if (!token) return null;
+  return await verifyToken(token);
+}

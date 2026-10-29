@@ -111,14 +111,14 @@ export async function deleteProduct(id: number) {
   try {
     const product = await prisma.product.findUnique({
       where: { id },
-      select: { image: true, slug: true },
+      select: { imageUrl: true, slug: true },
     });
 
     if (!product) {
       return { success: false, message: "Produk tidak ditemukan." };
     }
 
-    const publicId = extractPublicId(product.image);
+    const publicId = extractPublicId(product.imageUrl);
     if (publicId) {
       await cloudinary.uploader.destroy(publicId);
     }

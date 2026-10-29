@@ -28,11 +28,11 @@ export default async function StrukturalPage({
   let struct: any = {
     namaStruktural: org.name,
     subjudul: org.name,
-    ketua: "Belum Ditentukan",
+    ketua: "-",
     fotoKetua: null,
-    sekretaris: "Belum Ditentukan",
+    sekretaris: "-",
     fotoSekretaris: null,
-    bendahara: "Belum Ditentukan",
+    bendahara: "-",
     fotoBendahara: null,
     members: [] as MemberItem[],
   };
@@ -110,7 +110,7 @@ export default async function StrukturalPage({
           </div>
         </div>
 
-        {/* 4. DAFTAR SEKSI & ANGGOTA (JIKA ADA) */}
+        {/* 4. DAFTAR SEKSI & ANGGOTA */}
         {members.length > 0 && (
           <div className="pt-8 space-y-6">
             <div className="text-center">

@@ -1,53 +1,69 @@
-import Image from "next/image"
-import { notFound } from "next/navigation"
-import prisma from "@/lib/prisma"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import prisma from "@/lib/prisma";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { NewsCardDialog } from "@/components/news-card-dialog";
 
 export default async function KomunitasPage({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params
+  const { slug } = await params;
 
   const org = await prisma.organization.findUnique({
     where: { slug },
-  })
+    include: {
+      news: {
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
 
   if (!org) {
-    notFound()
+    notFound();
   }
 
   return (
     <main className="min-h-screen bg-cream">
       <Navbar />
 
-      {/* 1. HERO SECTION */}
-      <div className="relative h-[50vh] w-full flex flex-col justify-center pt-32 pb-12">
-        <Image
-          src={org.imageUrl}
-          alt={org.name}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/50" />
+      {/* HERO SECTION */}
+      <div className="relative min-h-[50vh] w-full flex flex-col justify-center pt-32 pb-12 bg-emerald-950 overflow-hidden">
+        {org.imageUrl ? (
+          <>
+            <Image
+              src={org.imageUrl}
+              alt={org.name}
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-b from-[#143225] to-[#1B4332]" />
+        )}
 
         <div className="relative z-10 w-full px-6 md:px-16 text-center md:text-left">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white drop-shadow-lg">
+            <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
               {org.name}
             </h1>
-
-            <p className="text-lg md:text-2xl text-gray-200 font-light drop-shadow-md max-w-2xl">
+            <p className="text-base md:text-lg text-gray-200 font-light drop-shadow-md max-w-2xl mt-2">
               {org.description}
             </p>
+            {!org.imageUrl && (
+              <p className="mt-3 text-xs text-emerald-200/80 italic">
+                (Foto utama kelompok belum diunggah oleh admin)
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 2. KOTAK INFORMASI / PORTAL BERITA */}
+      {/* KOTAK INFORMASI / PORTAL BERITA DINAMIS */}
       <section className="py-20 px-6 md:px-12 max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-mangrove-dark mb-4">Informasi & Kegiatan</h2>
@@ -56,29 +72,35 @@ export default async function KomunitasPage({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-[12] gap-[10px] md:h-[900px]">
-          <div className="md:col-span-2 md:row-span-3 bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-400 min-h-[200px] md:min-h-0">
-            <p>1. [Tempat Foto/Berita dari Admin]</p>
+        {org.news && org.news.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {org.news.map((item) => (
+              <NewsCardDialog key={item.id} item={item} />
+            ))}
           </div>
-          <div className="md:col-span-2 md:row-span-3 md:col-start-3 bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-400 min-h-[200px] md:min-h-0">
-            <p>2. [Tempat Foto/Berita dari Admin]</p>
+        ) : (
+          <div className="w-full py-16 px-6 bg-white border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center text-center">
+            <div className="w-12 h-12 mb-3 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-gray-700">
+              Belum Ada Kegiatan / Berita
+            </h3>
+            <p className="text-xs text-gray-400 mt-1 max-w-sm">
+              Admin {org.name} belum menerbitkan dokumentasi atau kabar kegiatan terbaru di sini.
+            </p>
           </div>
-          <div className="md:col-span-2 md:row-span-3 md:row-start-5 bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-400 min-h-[200px] md:min-h-0">
-            <p>3. [Tempat Foto/Berita dari Admin]</p>
-          </div>
-          <div className="md:col-span-2 md:row-span-3 md:col-start-3 md:row-start-5 bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-400 min-h-[200px] md:min-h-0">
-            <p>4. [Tempat Foto/Berita dari Admin]</p>
-          </div>
-          <div className="md:col-span-2 md:row-span-3 md:row-start-9 bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-400 min-h-[200px] md:min-h-0">
-            <p>5. [Tempat Foto/Berita dari Admin]</p>
-          </div>
-          <div className="md:col-span-2 md:row-span-3 md:col-start-3 md:row-start-9 bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-400 min-h-[200px] md:min-h-0">
-            <p>6. [Tempat Foto/Berita dari Admin]</p>
-          </div>
-        </div>
+        )}
       </section>
 
       <Footer />
     </main>
-  )
+  );
 }

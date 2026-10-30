@@ -4,6 +4,7 @@ import { WisataSection } from "@/components/wisata-section"
 import { ProdukSection } from "@/components/produk-section"
 import { KontakSection } from "@/components/kontak-section"
 import { Footer } from "@/components/footer"
+export const dynamic = "force-dynamic"
 
 export default function Home() {
   return (
